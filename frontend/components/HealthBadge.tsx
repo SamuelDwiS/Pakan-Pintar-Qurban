@@ -107,11 +107,7 @@ export function HealthBadge({
           </div>
           <div>
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-<<<<<<< HEAD
-              Standar Skrining KIAT VETINDO Kementan RI
-=======
               Kondisi Sapi Hari Ini
->>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
             </span>
             <h3 className="mt-0.5 text-base font-extrabold text-slate-900 sm:text-lg">
               {cfg.title}
@@ -241,38 +237,6 @@ export function HealthBadge({
           )}
         </div>
 
-<<<<<<< HEAD
-        {status.riskLevel !== "HIJAU" && (
-          <div className="space-y-2">
-            <div
-              className={`flex flex-wrap items-center justify-between gap-3 rounded-xl p-3.5 text-white ${
-                status.riskLevel === "MERAH" ? "bg-rose-600" : "bg-amber-600"
-              }`}
-            >
-              <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-                <MessageCircle className="h-5 w-5 shrink-0" />
-                <div>
-                  <p className="font-bold">
-                    Laporan 1-Klik WhatsApp ke {vetClinicName}
-                  </p>
-                  <p className="text-xs opacity-90">
-                    Kirim ringkasan gejala langsung ke mantri hewan / dokter langganan.
-                  </p>
-                </div>
-              </div>
-              <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-lg bg-white px-3.5 py-2 text-xs font-bold text-slate-900 shadow-xs transition-colors hover:bg-slate-100"
-              >
-                Kirim WA Darurat &rarr;
-              </a>
-            </div>
-            <p className="text-[11px] text-slate-500 text-center">
-              💡 Acuan lapangan: suntik vaksin &amp; vitamin oleh mantri hewan berkisar &plusmn;Rp 60.000 / tindakan.
-            </p>
-=======
         {/* Edukasi Penanganan Mandiri saat Status Waspada (Kuning) */}
         {status.riskLevel === "KUNING" && (
           <div className="rounded-xl border border-amber-200 bg-amber-50/90 p-3 text-xs text-amber-950">
@@ -397,7 +361,6 @@ export function HealthBadge({
                 );
               })}
             </div>
->>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
           </div>
         )}
       </div>

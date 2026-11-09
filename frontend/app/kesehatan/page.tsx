@@ -123,13 +123,6 @@ export default function KesehatanPage() {
       {/* Page Header & Quick Simulation Buttons */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-<<<<<<< HEAD
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-            Cek Kesehatan Sapi
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Centang gejala yang tampak hari ini — sistem otomatis menilai risiko PMK & memberikan panduan tindakan.
-=======
           <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
             Pemeriksaan Kesehatan
           </span>
@@ -138,7 +131,6 @@ export default function KesehatanPage() {
           </h1>
           <p className="text-xs text-slate-600">
             Periksa tanda fisik sapi untuk mendapatkan rekomendasi tindakan perawatan mandiri secara tepat.
->>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
           </p>
         </div>
 
@@ -188,15 +180,9 @@ export default function KesehatanPage() {
       {/* Form Pemeriksaan Gejala Visual & Sinyal Data */}
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         <SectionCard
-<<<<<<< HEAD
-          title="1. Gejala Fisik yang Terlihat Hari Ini"
-          subtitle="Ketuk gejala yang tampak pada mulut, kuku, atau perilaku sapi"
-          icon={<Stethoscope className="h-5 w-5" />}
-=======
           title="1. Tanda Fisik Sapi"
           subtitle="Centang gejala yang terlihat pada mulut, kuku, atau gaya berjalan sapi"
           icon={<Stethoscope className="h-4 w-4 sm:h-5 sm:w-5" />}
->>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
           action={
             <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-700">
               Skor: {livePreview.totalScore} ({livePreview.riskLevel})
@@ -221,15 +207,9 @@ export default function KesehatanPage() {
         </SectionCard>
 
         <SectionCard
-<<<<<<< HEAD
-          title="2. Penurunan Nafsu Makan / Bobot"
-          subtitle="Penurunan mendadak sering jadi tanda awal infeksi sebelum gejala fisik muncul"
-          icon={<Activity className="h-5 w-5" />}
-=======
           title="2. Nafsu Makan & Bobot"
           subtitle="Deteksi awal jika pakan bersisa banyak atau bobot sapi susut"
           icon={<Activity className="h-4 w-4 sm:h-5 sm:w-5" />}
->>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
         >
           <AnomalySignalInputs
             penurunanPakanPercent={formState.penurunanPakanPercent}

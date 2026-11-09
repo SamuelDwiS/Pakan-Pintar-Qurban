@@ -109,13 +109,6 @@ export default function RansumPage() {
       {/* Header & Main Actions */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-<<<<<<< HEAD
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-            Rekomendasi Pakan Harian
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Komposisi pakan lokal termurah yang memenuhi kebutuhan gizi sapi Anda hari ini.
-=======
           <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
             Racikan Pakan AI
           </span>
@@ -124,7 +117,6 @@ export default function RansumPage() {
           </h1>
           <p className="text-xs text-slate-600">
             Takaran rumput &amp; konsentrat paling murah untuk mencapai target bobot kurban.
->>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
           </p>
         </div>
 

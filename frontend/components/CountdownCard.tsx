@@ -66,19 +66,11 @@ export function CountdownCard({
 
       <div className="relative flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
         {/* Left: Cattle Identity & Countdown */}
-<<<<<<< HEAD
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur-xs">
-              <CalendarClock className="h-3.5 w-3.5 text-emerald-200" />
-              {formatIndonesianDate(profile.targetDateQurban)}
-=======
         <div className="space-y-2.5">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-0.5 text-[11px] font-semibold backdrop-blur-xs sm:text-xs">
               <CalendarClock className="h-3 w-3 text-emerald-200" />
               Target: {formatIndonesianDate(profile.targetDateQurban)}
->>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
             </span>
 
             {barnName && (
@@ -88,18 +80,6 @@ export function CountdownCard({
               </span>
             )}
 
-<<<<<<< HEAD
-            {daysInBarn > 0 && daysInBarn <= 60 && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950/40 px-2.5 py-1 text-xs font-medium text-emerald-200">
-                🌱 Adaptasi Hari ke-{daysInBarn} (&plusmn;2 bln)
-              </span>
-            )}
-          </div>
-
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-emerald-200">
-              {profile.name}
-=======
             <span className="inline-flex items-center rounded-full bg-emerald-950/40 px-2.5 py-0.5 text-[11px] font-medium text-emerald-100 sm:text-xs">
               {profile.breed}
             </span>
@@ -108,19 +88,13 @@ export function CountdownCard({
           <div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-200">
               Sapi: {profile.name}
->>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
             </p>
             <div className="mt-0.5 flex flex-wrap items-baseline gap-2">
               <h1 className="text-2xl font-black tracking-tight sm:text-4xl">
                 {daysToQurban} Hari Lagi
               </h1>
-<<<<<<< HEAD
-              <span className="text-sm font-medium text-emerald-100">
-                menuju hari kurban
-=======
               <span className="text-xs font-medium text-emerald-100 sm:text-sm">
                 menuju Idul Adha
->>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
               </span>
             </div>
           </div>
@@ -135,30 +109,18 @@ export function CountdownCard({
                   <strong className="font-bold text-white">
                     {adgRequiredKg.toFixed(2)} kg/hr
                   </strong>{" "}
-<<<<<<< HEAD
-                  — realistis untuk {profile.breed}
-=======
                   realistis
->>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
                 </span>
               </div>
             ) : (
               <div className="inline-flex items-start gap-1.5 rounded-xl bg-amber-400/20 px-3 py-1.5 text-xs text-amber-50 ring-1 ring-amber-300/50">
                 <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-300" />
                 <span>
-<<<<<<< HEAD
-                  Target{" "}
-=======
                   Target naik{" "}
->>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
                   <strong className="font-bold text-white">
                     {adgRequiredKg.toFixed(2)} kg/hr
                   </strong>{" "}
-<<<<<<< HEAD
-                  terlalu tinggi untuk {profile.breed} (maksimal ~{maxBiologicalAdgKg} kg/hari). Sesuaikan target di menu Ternak.
-=======
                   melebihi batas {profile.breed} (~{maxBiologicalAdgKg} kg/hr)
->>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
                 </span>
               </div>
             )}
