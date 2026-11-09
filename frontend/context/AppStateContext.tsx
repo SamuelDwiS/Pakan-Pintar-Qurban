@@ -18,6 +18,7 @@ import {
   DEFAULT_DEMO_ACCOUNTS,
   DEFAULT_FARM_SETTINGS,
   DEFAULT_LOCAL_FEEDS,
+  DEFAULT_VET_CONTACTS,
 } from "@/lib/constants";
 import {
   calculateDaysToQurban,
@@ -45,7 +46,7 @@ const STORAGE_KEYS = {
   farmSettings: "ppq_farm_settings_v3",
   cattleList: "ppq_cattle_list_v3",
   activeCattleId: "ppq_active_cattle_id_v3",
-  feeds: "ppq_local_feeds_v3",
+  feeds: "ppq_local_feeds_v4",
   healthMap: "ppq_health_map_v3",
   healthHistoryMap: "ppq_health_history_map_v3",
 } as const;
@@ -323,7 +324,17 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
         }
 
         const rawSettings = localStorage.getItem(STORAGE_KEYS.farmSettings);
-        if (rawSettings) loadedSettings = JSON.parse(rawSettings);
+        if (rawSettings) {
+          const parsedSettings = JSON.parse(rawSettings);
+          loadedSettings = {
+            ...DEFAULT_FARM_SETTINGS,
+            ...parsedSettings,
+            vetContacts:
+              parsedSettings.vetContacts && parsedSettings.vetContacts.length > 0
+                ? parsedSettings.vetContacts
+                : DEFAULT_VET_CONTACTS,
+          };
+        }
 
         const rawList = localStorage.getItem(STORAGE_KEYS.cattleList);
         if (rawList) {
@@ -350,8 +361,18 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
 
         const rawFeeds = localStorage.getItem(STORAGE_KEYS.feeds);
         if (rawFeeds) {
-          loadedFeeds = JSON.parse(rawFeeds);
-          hasSavedFeeds = true;
+          const parsedFeeds = JSON.parse(rawFeeds);
+          if (
+            Array.isArray(parsedFeeds) &&
+            parsedFeeds.some((f) =>
+              f.name.toLowerCase().includes("dami") ||
+              f.name.toLowerCase().includes("nutrifeed") ||
+              f.name.toLowerCase().includes("polar")
+            )
+          ) {
+            loadedFeeds = parsedFeeds;
+            hasSavedFeeds = true;
+          }
         }
 
         const rawHealthMap = localStorage.getItem(STORAGE_KEYS.healthMap);

@@ -38,13 +38,25 @@ export interface BreedItem {
   description?: string;
 }
 
+export interface VetContactItem {
+  id: string;
+  name: string; // Contoh: Pak Mantri Budi, drh. Hendra
+  phone: string; // Format 628xxx
+  roleNote?: string; // Contoh: Mantri Langganan Utama, Puskeswan Kecamatan, Mantri Cadangan
+  isPrimary?: boolean;
+}
+
 export interface FarmSettings {
   defaultTargetDateQurban: string; // YYYY-MM-DD
-  vetWhatsappNumber: string; // Contoh: 6281234567890
+  vetWhatsappNumber: string; // Contoh: 6281234567890 (fallback)
   vetClinicName: string; // Contoh: Puskeswan Kecamatan / Mantri Hewan
+<<<<<<< HEAD
   pricePerKwintalNormal?: number; // Rp per kwintal hari biasa (misal 55.000.000)
   pricePerKwintalEid?: number; // Rp per kwintal jelang kurban (misal 80.000.000)
   maxQurbanWeightKg?: number; // Bobot maks layak kurban (misal 700 kg = 7 kwintal)
+=======
+  vetContacts?: VetContactItem[]; // Daftar kontak mantri langganan (hingga 3 mantri)
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
 }
 
 export interface FeedItem {
@@ -124,6 +136,7 @@ export interface HealthChecklistForm {
   diare: boolean;
   penurunanPakanPercent: number;
   penurunanBobotPercent: number;
+  catatanTambahan?: string;
 }
 
 export interface HealthStatus {
@@ -133,8 +146,10 @@ export interface HealthStatus {
   riskBadgeColor: RiskBadgeColor;
   summary: string;
   recommendedAction: string;
+  actionSteps?: string[];
   checkedAt: string; // ISO timestamp
   triggeredIndicators?: string[];
+  catatanTambahan?: string;
   source?: "backend" | "fallback";
 }
 

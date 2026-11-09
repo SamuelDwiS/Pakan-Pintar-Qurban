@@ -81,7 +81,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <span>
                   PERINGATAN MERAH ({redAlertCattle.name}): Terindikasi gejala
                   risiko PMK (Skor {redAlertStatus.totalScore}). Segera isolasi
-                  ternak &amp; kirim laporan WA Puskeswan!
+                  ternak &amp; cek panduan tindakan darurat!
                 </span>
               </div>
               <Link
@@ -95,7 +95,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-24 pt-5 sm:px-6 sm:pb-12 sm:pt-7 lg:px-8">
+        <main className="mx-auto w-full max-w-6xl flex-1 px-3 pb-28 pt-3.5 sm:px-6 sm:pb-12 sm:pt-7 lg:px-8">
           {children}
         </main>
 

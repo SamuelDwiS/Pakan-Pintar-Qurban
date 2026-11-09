@@ -568,11 +568,19 @@ export function evaluateHealthFallback(
       riskLevel: "MERAH",
       riskBadgeColor: "red",
       summary:
-        "BAHAYA / INDIKASI KUAT PMK! Terdeteksi gejala klinis utama atau kombinasi anomali risiko tinggi.",
+        "BAHAYA / INDIKASI PMK! Terdeteksi gejala klinis utama (lepuh/air liur) atau kombinasi anomali risiko tinggi.",
       recommendedAction:
-        "ALERT KHUSUS! Segera isolasi ternak dari kelompoknya. Jangan dipindahkan atau dijual keluar kandang. Hubungi Dokter Hewan / Puskeswan terdekat untuk penanganan darurat sesuai protokol KIAT VETINDO PMK.",
+        "Lakukan tindakan karantina darurat sekarang juga dan segera panggil mantri langganan Anda!",
+      actionSteps: [
+        "Pindahkan sapi ke Kandang Isolasi / sekat paling ujung terpisah dari kelompok.",
+        "STOP mutasi: Jangan memindahkan atau menjual sapi keluar kandang untuk mencegah wabah.",
+        "Semprot kandang, sekat, dan lantai dengan disinfektan (larutan kaporit atau asam sitrat/citric acid).",
+        "Cuci luka lepuh di mulut & sela kuku dengan air hangat bersih untuk meredakan nyeri.",
+        "Segera hubungi mantri hewan langganan Anda untuk pemeriksaan medis dan suntikan obat/vitamin.",
+      ],
       checkedAt: new Date().toISOString(),
       triggeredIndicators: triggered,
+      catatanTambahan: input.catatanTambahan,
       source: "fallback",
     };
   }
@@ -586,9 +594,16 @@ export function evaluateHealthFallback(
       summary:
         "WASPADA! Terdeteksi anomali nafsu makan/bobot atau gejala klinis ringan.",
       recommendedAction:
-        "Tingkatkan pengamatan harian setiap pagi & sore, pisahkan tempat pakan dan minum dari sapi lain, berikan vitamin/elektrolit pendukung, serta evaluasi ulang dalam 24 jam.",
+        "Lakukan penanganan mandiri awal: pisahkan palungan dan berikan minuman pemulih cairan.",
+      actionSteps: [
+        "Pisahkan tempat makan & minum agar tidak tertular ke sapi lain di kandang.",
+        "Beri minuman hangat dicampur sedikit garam dapur, gula merah, atau molases untuk stamina.",
+        "Berikan rumput segar yang agak layu; kurangi porsi ampas tahu basah atau konsentrat jika ada diare.",
+        "Amati suhu tubuh & nafsu makan selama 1x24 jam. Jika besok belum pulih, panggil mantri hewan langganan Anda.",
+      ],
       checkedAt: new Date().toISOString(),
       triggeredIndicators: triggered,
+      catatanTambahan: input.catatanTambahan,
       source: "fallback",
     };
   }
@@ -598,11 +613,18 @@ export function evaluateHealthFallback(
     totalScore: score,
     riskLevel: "HIJAU",
     riskBadgeColor: "green",
-    summary: "SEHAT / NORMAL. Tidak ditemukan indikasi klinis mengarah ke PMK.",
+    summary: "SEHAT & NORMAL. Tidak ditemukan indikasi klinis penyakit maupun mogok makan.",
     recommendedAction:
-      "Lanjutkan rutinitas pemberian ransum teroptimasi, jaga biosekuriti kandang, dan lakukan penimbangan berkala.",
+      "Pertahankan manajemen pakan pokok (rumput & dami) serta adukan konsentrat harian.",
+    actionSteps: [
+      "Beri pakan segar & adukan konsentrat sesuai porsi hari ini (bagi 2x: pagi & sore).",
+      "Pastikan ketersediaan air minum bersih selalu penuh di bak/ember (ad libitum).",
+      "Bersihkan sisa pakan yang mulai masam di palungan setiap pagi.",
+      "Lakukan penimbangan berkala 1–2 minggu sekali untuk memantau target kurban.",
+    ],
     checkedAt: new Date().toISOString(),
     triggeredIndicators: triggered,
+    catatanTambahan: input.catatanTambahan,
     source: "fallback",
   };
 }

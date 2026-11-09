@@ -59,27 +59,36 @@ export function CountdownCard({
     : 0;
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-800 p-5 text-white shadow-md sm:p-7">
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-800 p-4 text-white shadow-md sm:p-6">
       {/* Decorative Pattern */}
-      <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
-      <div className="pointer-events-none absolute -bottom-16 left-8 h-40 w-40 rounded-full bg-teal-400/15 blur-2xl" />
+      <div className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-white/10 blur-2xl" />
+      <div className="pointer-events-none absolute -bottom-16 left-8 h-36 w-36 rounded-full bg-teal-400/15 blur-2xl" />
 
-      <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+      <div className="relative flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
         {/* Left: Cattle Identity & Countdown */}
+<<<<<<< HEAD
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur-xs">
               <CalendarClock className="h-3.5 w-3.5 text-emerald-200" />
               {formatIndonesianDate(profile.targetDateQurban)}
+=======
+        <div className="space-y-2.5">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-0.5 text-[11px] font-semibold backdrop-blur-xs sm:text-xs">
+              <CalendarClock className="h-3 w-3 text-emerald-200" />
+              Target: {formatIndonesianDate(profile.targetDateQurban)}
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
             </span>
 
             {barnName && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950/45 px-2.5 py-1 text-xs font-semibold text-emerald-100">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950/45 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-100 sm:text-xs">
                 <Warehouse className="h-3 w-3 text-emerald-300" />
                 <span>{barnName}</span>
               </span>
             )}
 
+<<<<<<< HEAD
             {daysInBarn > 0 && daysInBarn <= 60 && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950/40 px-2.5 py-1 text-xs font-medium text-emerald-200">
                 🌱 Adaptasi Hari ke-{daysInBarn} (&plusmn;2 bln)
@@ -90,39 +99,66 @@ export function CountdownCard({
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-emerald-200">
               {profile.name}
+=======
+            <span className="inline-flex items-center rounded-full bg-emerald-950/40 px-2.5 py-0.5 text-[11px] font-medium text-emerald-100 sm:text-xs">
+              {profile.breed}
+            </span>
+          </div>
+
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-200">
+              Sapi: {profile.name}
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
             </p>
-            <div className="mt-1 flex flex-wrap items-baseline gap-3">
-              <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+            <div className="mt-0.5 flex flex-wrap items-baseline gap-2">
+              <h1 className="text-2xl font-black tracking-tight sm:text-4xl">
                 {daysToQurban} Hari Lagi
               </h1>
+<<<<<<< HEAD
               <span className="text-sm font-medium text-emerald-100">
                 menuju hari kurban
+=======
+              <span className="text-xs font-medium text-emerald-100 sm:text-sm">
+                menuju Idul Adha
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
               </span>
             </div>
           </div>
 
           {/* Biological Feasibility Pill */}
-          <div className="pt-1">
+          <div className="pt-0.5">
             {isAdgFeasible ? (
-              <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-950/35 px-3.5 py-2 text-xs text-emerald-50 ring-1 ring-white/15 sm:text-sm">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-300" />
+              <div className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-950/35 px-3 py-1.5 text-xs text-emerald-50 ring-1 ring-white/15">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-300" />
                 <span>
                   Target naik{" "}
                   <strong className="font-bold text-white">
-                    {adgRequiredKg.toFixed(2)} kg/hari
+                    {adgRequiredKg.toFixed(2)} kg/hr
                   </strong>{" "}
+<<<<<<< HEAD
                   — realistis untuk {profile.breed}
+=======
+                  realistis
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
                 </span>
               </div>
             ) : (
-              <div className="inline-flex items-start gap-2 rounded-xl bg-amber-400/20 px-3.5 py-2.5 text-xs text-amber-50 ring-1 ring-amber-300/50 sm:text-sm">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
+              <div className="inline-flex items-start gap-1.5 rounded-xl bg-amber-400/20 px-3 py-1.5 text-xs text-amber-50 ring-1 ring-amber-300/50">
+                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-300" />
                 <span>
+<<<<<<< HEAD
                   Target{" "}
+=======
+                  Target naik{" "}
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
                   <strong className="font-bold text-white">
-                    {adgRequiredKg.toFixed(2)} kg/hari
+                    {adgRequiredKg.toFixed(2)} kg/hr
                   </strong>{" "}
+<<<<<<< HEAD
                   terlalu tinggi untuk {profile.breed} (maksimal ~{maxBiologicalAdgKg} kg/hari). Sesuaikan target di menu Ternak.
+=======
+                  melebihi batas {profile.breed} (~{maxBiologicalAdgKg} kg/hr)
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
                 </span>
               </div>
             )}
@@ -130,36 +166,36 @@ export function CountdownCard({
         </div>
 
         {/* Right: Weight Progress Box */}
-        <div className="w-full rounded-2xl bg-white/12 p-4 backdrop-blur-md ring-1 ring-white/20 sm:p-5 lg:max-w-sm">
-          <div className="flex items-center justify-between text-xs font-medium text-emerald-100">
+        <div className="w-full rounded-2xl bg-white/12 p-3.5 backdrop-blur-md ring-1 ring-white/20 sm:p-4 lg:max-w-sm">
+          <div className="flex items-center justify-between text-xs font-semibold text-emerald-100">
             <span className="flex items-center gap-1.5">
-              <Scale className="h-4 w-4 text-emerald-200" />
-              Progres Bobot Kurban
+              <Scale className="h-3.5 w-3.5 text-emerald-200" />
+              Progres Bobot
             </span>
-            <span className="font-bold text-white">{progressPercent}%</span>
+            <span className="font-black text-white">{progressPercent}%</span>
           </div>
 
-          <div className="mt-2.5 h-3 w-full overflow-hidden rounded-full bg-emerald-950/50">
+          <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-emerald-950/50">
             <div
               className="h-full rounded-full bg-gradient-to-r from-emerald-300 to-amber-300 transition-all duration-500"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
 
-          <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-xl bg-emerald-950/30 p-2">
+          <div className="mt-2.5 grid grid-cols-3 gap-1.5 text-center">
+            <div className="rounded-xl bg-emerald-950/30 p-1.5">
               <p className="text-[10px] text-emerald-200">Awal</p>
               <p className="text-xs font-bold sm:text-sm">
                 {formatKg(profile.initialWeightKg, 0)}
               </p>
             </div>
-            <div className="rounded-xl bg-white/15 p-2 ring-1 ring-white/25">
+            <div className="rounded-xl bg-white/15 p-1.5 ring-1 ring-white/25">
               <p className="text-[10px] text-emerald-100">Saat Ini</p>
-              <p className="text-xs font-extrabold sm:text-sm">
+              <p className="text-xs font-black sm:text-sm">
                 {formatKg(profile.currentWeightKg, 1)}
               </p>
             </div>
-            <div className="rounded-xl bg-emerald-950/30 p-2">
+            <div className="rounded-xl bg-emerald-950/30 p-1.5">
               <p className="text-[10px] text-emerald-200">Target</p>
               <p className="text-xs font-bold sm:text-sm">
                 {formatKg(profile.targetWeightKg, 0)}
@@ -167,18 +203,18 @@ export function CountdownCard({
             </div>
           </div>
 
-          <div className="mt-3 flex items-center justify-between border-t border-white/15 pt-2.5 text-xs">
-            <span className="flex items-center gap-1 text-emerald-100">
-              <TrendingUp className="h-3.5 w-3.5" />
+          <div className="mt-2.5 flex items-center justify-between border-t border-white/15 pt-2 text-xs">
+            <span className="flex items-center gap-1 text-emerald-100 text-[11px] sm:text-xs">
+              <TrendingUp className="h-3 w-3" />
               Kurang{" "}
               <strong className="text-white">{formatKg(remainingKg, 1)}</strong>
             </span>
             <Link
               href={`/profil?detail=${encodeURIComponent(profile.id)}`}
-              className="inline-flex items-center gap-1 font-semibold text-emerald-200 transition-colors hover:text-white"
+              className="inline-flex items-center gap-1 font-bold text-emerald-200 transition-colors hover:text-white text-[11px] sm:text-xs"
             >
-              Catat Timbangan
-              <ArrowRight className="h-3.5 w-3.5" />
+              + Timbang Sapi
+              <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
         </div>

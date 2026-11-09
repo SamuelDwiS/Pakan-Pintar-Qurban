@@ -48,7 +48,7 @@ export const OPERATIONAL_NAV_ITEMS = [
     href: "/kesehatan",
     label: "Skrining Kesehatan",
     shortLabel: "Kesehatan",
-    description: "Deteksi dini risiko PMK & laporan WA otomatis",
+    description: "Deteksi dini risiko PMK & rekomendasi tindakan",
     icon: Activity,
   },
 ] as const;
@@ -166,7 +166,7 @@ export function NavbarHeader({
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
       {/* Mobile Header (< md) */}
-      <div className="flex items-center justify-between gap-2 px-4 py-2.5 md:hidden">
+      <div className="flex items-center justify-between gap-2 px-3.5 py-2 md:hidden">
         <Link href="/">
           <BrandLogo
             variant="header"
@@ -175,37 +175,78 @@ export function NavbarHeader({
           />
         </Link>
 
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={onOpenGlossary}
-            className="inline-flex items-center rounded-xl border border-slate-200 bg-white p-2 text-slate-700 hover:bg-slate-50"
-            title="Panduan Istilah Pakan"
-            aria-label="Panduan Istilah Pakan"
-          >
-            <BookOpen className="h-4 w-4 text-emerald-700" />
-          </button>
+        {currentUser && (
+          <div className="relative" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setUserDropdownOpen((prev) => !prev)}
+              title={`Akun: ${currentUser.name}`}
+              aria-label={`Akun ${currentUser.name}`}
+              className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-2xs hover:bg-slate-50"
+            >
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-700 text-white">
+                <User className="h-4 w-4" />
+              </div>
+              <span className="absolute bottom-1 right-1 h-2 w-2 rounded-full bg-emerald-500 ring-1.5 ring-white" />
+            </button>
 
-          <button
-            type="button"
-            onClick={handleResetDemo}
-            className="inline-flex items-center rounded-xl border border-slate-200 bg-white p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-            title="Reset Data Demo"
-            aria-label="Reset Data Demo"
-          >
-            <RotateCcw className="h-4 w-4" />
-          </button>
+            {userDropdownOpen && (
+              <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl ring-1 ring-slate-900/5">
+                <div className="border-b border-slate-100 pb-2.5">
+                  <span className="inline-block rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-800 ring-1 ring-inset ring-emerald-200">
+                    Peternak Mandiri
+                  </span>
+                  <p className="mt-1 truncate text-sm font-extrabold text-slate-900">
+                    {currentUser.name}
+                  </p>
+                  <p className="truncate text-xs font-semibold text-emerald-700">
+                    {currentUser.farmName}
+                  </p>
+                </div>
 
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="inline-flex items-center rounded-xl border border-rose-200 bg-rose-50/70 p-2 text-rose-600 hover:bg-rose-100"
-            title="Keluar Akun"
-            aria-label="Keluar Akun"
-          >
-            <LogOut className="h-4 w-4" />
-          </button>
-        </div>
+                <div className="space-y-1 py-2 border-b border-slate-100 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserDropdownOpen(false);
+                      onOpenGlossary();
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    <BookOpen className="h-4 w-4 text-emerald-700" />
+                    <span>Panduan Istilah Pakan</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserDropdownOpen(false);
+                      handleResetDemo();
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    <RotateCcw className="h-4 w-4 text-slate-500" />
+                    <span>Reset Data Demo</span>
+                  </button>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50"
+                  >
+                    <span className="flex items-center gap-2">
+                      <LogOut className="h-4 w-4" />
+                      <span>Keluar Akun</span>
+                    </span>
+                    <span>&rarr;</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Desktop Topbar (>= md) */}

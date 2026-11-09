@@ -107,34 +107,45 @@ export default function RansumPage() {
   return (
     <div className="space-y-6">
       {/* Header & Main Actions */}
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
+<<<<<<< HEAD
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
             Rekomendasi Pakan Harian
           </h1>
           <p className="mt-1 text-sm text-slate-500">
             Komposisi pakan lokal termurah yang memenuhi kebutuhan gizi sapi Anda hari ini.
+=======
+          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+            Racikan Pakan AI
+          </span>
+          <h1 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
+            Racikan Pakan Paling Hemat
+          </h1>
+          <p className="text-xs text-slate-600">
+            Takaran rumput &amp; konsentrat paling murah untuk mencapai target bobot kurban.
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href="/master-pakan"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-50"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-50"
           >
             <Database className="h-4 w-4 text-emerald-700" />
-            <span>Master Pakan ({activeCount} Aktif)</span>
+            <span>Master Pakan ({activeCount})</span>
           </Link>
 
           <button
             type="button"
             disabled={isOptimizing}
             onClick={() => runOptimization()}
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-colors hover:bg-emerald-800 disabled:opacity-60 sm:text-sm"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-700 px-3.5 py-2 text-xs font-bold text-white shadow-xs transition-colors hover:bg-emerald-800 disabled:opacity-60 sm:text-sm"
           >
             <Sparkles className="h-4 w-4" />
             <span>
-              {isOptimizing ? "Menghitung Solver..." : "Hitung Ulang AI"}
+              {isOptimizing ? "Menghitung..." : "Hitung Ulang AI"}
             </span>
           </button>
         </div>
@@ -355,11 +366,43 @@ export default function RansumPage() {
               </div>
 
               <SectionCard
-                title={`Total Kebutuhan Bahan Pakan Harian — ${barnRecap.targetBarn?.name}`}
-                subtitle="Siapkan total takaran berikut di gudang pakan untuk seluruh sapi di kandang ini hari ini"
-                icon={<Wheat className="h-5 w-5" />}
+                title={`Total Adukan Pakan — ${barnRecap.targetBarn?.name}`}
+                subtitle="Siapkan total pakan berikut di gudang untuk seluruh sapi di kandang ini"
+                icon={<Wheat className="h-4 w-4 sm:h-5 sm:w-5" />}
               >
-                <div className="overflow-x-auto">
+                {/* Mobile Card List (< md) */}
+                <div className="space-y-2 md:hidden">
+                  {barnRecap.aggregatedFeeds.map((item) => (
+                    <div
+                      key={item.feedId}
+                      className="flex items-center justify-between rounded-xl border border-slate-200/90 bg-white p-3 shadow-2xs"
+                    >
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900">
+                          {item.feedName}
+                        </h4>
+                        <p className="text-[11px] font-semibold text-slate-500 mt-0.5">
+                          {formatRupiah(item.totalCostRp)} / hari
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <span className="inline-flex rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-black text-emerald-800 ring-1 ring-emerald-200">
+                          {formatKg(item.totalAsFedKg, 1)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="rounded-xl bg-emerald-50/70 border border-emerald-200 p-3 flex items-center justify-between font-bold text-xs text-emerald-950">
+                    <span>TOTAL 1 KANDANG:</span>
+                    <span className="text-sm font-black text-emerald-900">
+                      {formatKg(barnRecap.totalAsFedDayKg, 1)} segar
+                    </span>
+                  </div>
+                </div>
+
+                {/* Desktop Table (>= md) */}
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-left text-xs sm:text-sm">
                     <thead>
                       <tr className="border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">

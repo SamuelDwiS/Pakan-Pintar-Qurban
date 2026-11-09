@@ -24,21 +24,21 @@ export function SectionCard({
       className={`rounded-2xl border border-slate-200/90 bg-white shadow-xs transition-shadow hover:shadow-sm ${className}`}
     >
       {(title || subtitle || action) && (
-        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
-          <div className="flex items-start gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-3.5 py-3 sm:px-6 sm:py-4">
+          <div className="flex items-center gap-2.5 min-w-0">
             {icon && (
-              <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/70">
+              <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/70">
                 {icon}
               </div>
             )}
-            <div>
+            <div className="min-w-0">
               {title && (
-                <h2 className="text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
+                <h2 className="text-sm font-bold tracking-tight text-slate-900 sm:text-base truncate sm:whitespace-normal">
                   {title}
                 </h2>
               )}
               {subtitle && (
-                <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
+                <p className="text-[11px] text-slate-500 sm:text-xs line-clamp-1 sm:line-clamp-none">
                   {subtitle}
                 </p>
               )}
@@ -47,8 +47,7 @@ export function SectionCard({
           {action && <div className="shrink-0">{action}</div>}
         </div>
       )}
-      <div className={`p-5 sm:p-6 ${bodyClassName}`}>{children}</div>
+      <div className={`p-3.5 sm:p-6 ${bodyClassName}`}>{children}</div>
     </section>
   );
 }
-

@@ -6,6 +6,7 @@ import type {
   FeedItem,
   HealthStatus,
   StoredUserAccount,
+  VetContactItem,
 } from "@/types";
 
 export const API_BASE_URL =
@@ -24,14 +25,43 @@ export const DEFAULT_DEMO_ACCOUNTS: StoredUserAccount[] = [
 
 // ================= DATA MASTER BAWAAN =================
 
+export const DEFAULT_VET_CONTACTS: VetContactItem[] = [
+  {
+    id: "vet-1",
+    name: "Pak Mantri Budi",
+    phone: "6281390375757",
+    roleNote: "Mantri Langganan Utama (Desa)",
+    isPrimary: true,
+  },
+  {
+    id: "vet-2",
+    name: "drh. Hendra Wijaya",
+    phone: "6281234567890",
+    roleNote: "Puskeswan / Medik Veteriner Kecamatan",
+    isPrimary: false,
+  },
+  {
+    id: "vet-3",
+    name: "Pak Mantri Yanto",
+    phone: "6285678901234",
+    roleNote: "Mantri Cadangan (Suntik / IB)",
+    isPrimary: false,
+  },
+];
+
 export const DEFAULT_FARM_SETTINGS: FarmSettings = {
   defaultTargetDateQurban: "2027-05-17", // Estimasi Idul Adha 1448 H
   vetWhatsappNumber: "6281390375757",
+<<<<<<< HEAD
   vetClinicName: "Mantri Hewan / Puskeswan Terdekat",
   // Data harga pasar kurban (dari wawancara lapangan Sragen 2026)
   pricePerKwintalNormal: 55_000_000,       // Rp 55 jt/kwintal (hari biasa)
   pricePerKwintalEid: 80_000_000,          // Rp 80 jt/kwintal (menjelang Idul Adha)
   maxQurbanWeightKg: 700,                  // Bobot maks layak kurban: 7 kwintal
+=======
+  vetClinicName: "Puskeswan / Medik Veteriner Terdekat",
+  vetContacts: DEFAULT_VET_CONTACTS,
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
 };
 
 export const DEFAULT_BARNS: BarnItem[] = [
@@ -116,12 +146,17 @@ export const CATTLE_BREEDS = DEFAULT_BREEDS.map((b) => ({
   typicalMaxAdg: b.normalAdgKg,
 }));
 
+<<<<<<< HEAD
 // Seed Database Pakan Lokal — Diperbarui berdasarkan wawancara peternak Sragen 2026
 // Referensi lapangan: 1 ember = ±3,6–4 kg / 1 sapi / sekali makan
 // Pakan nyata: Pollar Cilacap, NutriFeed, Ampas Tahu, Katul
+=======
+// Seed Database Pakan Lokal Sesuai Hasil Temuan Peternak di Lapangan
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
 export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
   // ── HIJAUAN ────────────────────────────────────────────────────────────────
   {
+<<<<<<< HEAD
     id: "feed_1",
     name: "Rumput Lapang",
     category: "Hijauan",
@@ -135,11 +170,19 @@ export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
   {
     id: "feed_2",
     name: "Rumput Gajah / Odot",
+=======
+    id: "feed_rumput",
+    name: "Rumput Segar",
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
     category: "Hijauan",
     bkPercent: 21.0,
     pkPercent: 9.5,
     tdnPercent: 55.0,
+<<<<<<< HEAD
     maxLimitKg: 60.0,
+=======
+    maxLimitKg: 40.0,
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
     pricePerKg: 500,
     isActive: false,
   },
@@ -159,6 +202,7 @@ export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
     isActive: true,
   },
   {
+<<<<<<< HEAD
     id: "feed_9",
     name: "NutriFeed Konsentrat",
     category: "Konsentrat",
@@ -233,6 +277,61 @@ export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
     maxLimitKg: 2.0,
     pricePerKg: 500,
     isActive: false,
+=======
+    id: "feed_dami",
+    name: "Dami (Jerami Padi)",
+    category: "Limbah Pertanian",
+    bkPercent: 86.0,
+    pkPercent: 4.5,
+    tdnPercent: 43.0,
+    maxLimitKg: 8.0,
+    pricePerKg: 400,
+    isActive: true,
+  },
+  {
+    id: "feed_nutrifeed",
+    name: "Nutrifeed (Konsentrat)",
+    category: "Konsentrat",
+    bkPercent: 88.0,
+    pkPercent: 14.5,
+    tdnPercent: 70.0,
+    maxLimitKg: 6.0,
+    pricePerKg: 4200,
+    isActive: true,
+  },
+  {
+    id: "feed_polar",
+    name: "Bran Polar",
+    category: "Konsentrat",
+    bkPercent: 88.5,
+    pkPercent: 15.5,
+    tdnPercent: 74.0,
+    maxLimitKg: 4.5,
+    pricePerKg: 4000,
+    isActive: true,
+  },
+  {
+    id: "feed_katul",
+    name: "Katul (Dedak Padi)",
+    category: "Konsentrat",
+    bkPercent: 88.0,
+    pkPercent: 11.5,
+    tdnPercent: 65.0,
+    maxLimitKg: 4.0,
+    pricePerKg: 3200,
+    isActive: true,
+  },
+  {
+    id: "feed_ampas_tahu",
+    name: "Ampas Tahu",
+    category: "Konsentrat",
+    bkPercent: 14.0,
+    pkPercent: 22.0,
+    tdnPercent: 76.0,
+    maxLimitKg: 10.0,
+    pricePerKg: 1000,
+    isActive: true,
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
   },
 ];
 
@@ -404,9 +503,15 @@ export function createDefaultHealthStatus(cattleId: string): HealthStatus {
     totalScore: 0,
     riskLevel: "HIJAU",
     riskBadgeColor: "green",
-    summary: "Kondisi klinis dan nafsu makan ternak terpantau sehat/normal.",
+    summary: "SEHAT & NORMAL. Tidak ditemukan tanda fisik penyakit maupun mogok makan.",
     recommendedAction:
-      "Lanjutkan pemberian ransum harian terjadwal, jaga kebersihan kandang, dan lakukan penimbangan berkala.",
+      "Lanjutkan rutinitas pemberian pakan pokok (rumput & dami) serta adukan konsentrat harian.",
+    actionSteps: [
+      "Beri pakan segar & adukan konsentrat sesuai porsi hari ini (bagi 2x: pagi & sore).",
+      "Pastikan ketersediaan air minum bersih selalu penuh di bak/ember (ad libitum).",
+      "Bersihkan sisa pakan yang mulai masam di palungan setiap pagi.",
+      "Lakukan penimbangan berkala 1–2 minggu sekali untuk memantau tren target kurban.",
+    ],
     checkedAt: "2026-11-05T08:00:00.000Z",
     triggeredIndicators: [],
     source: "fallback",

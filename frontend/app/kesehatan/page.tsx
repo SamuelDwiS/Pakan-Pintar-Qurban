@@ -5,6 +5,7 @@ import {
   Activity,
   CheckCircle2,
   ClipboardCheck,
+  FileText,
   History,
   ShieldAlert,
   Stethoscope,
@@ -43,6 +44,7 @@ export default function KesehatanPage() {
     diare: false,
     penurunanPakanPercent: 0,
     penurunanBobotPercent: 0,
+    catatanTambahan: "",
   });
 
   // Deteksi otomatis persentase penurunan bobot dari 2 catatan timbangan terakhir
@@ -75,6 +77,7 @@ export default function KesehatanPage() {
             diare: false,
             penurunanPakanPercent: 0,
             penurunanBobotPercent: 0,
+            catatanTambahan: "",
           }
         : preset === "waspada"
         ? {
@@ -86,6 +89,7 @@ export default function KesehatanPage() {
             diare: false,
             penurunanPakanPercent: 25,
             penurunanBobotPercent: 1.0,
+            catatanTambahan: "Nafsu makan berkurang sejak pagi.",
           }
         : {
             cattleId: profile.id,
@@ -96,6 +100,7 @@ export default function KesehatanPage() {
             diare: false,
             penurunanPakanPercent: 35,
             penurunanBobotPercent: 2.5,
+            catatanTambahan: "Mulut berbusa & luka pada celah kuku.",
           };
 
     setFormState(nextForm);
@@ -111,51 +116,60 @@ export default function KesehatanPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Quick Multi-Cattle Switcher */}
       <CattleSelectorBar />
 
       {/* Page Header & Quick Simulation Buttons */}
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
+<<<<<<< HEAD
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
             Cek Kesehatan Sapi
           </h1>
           <p className="mt-1 text-sm text-slate-500">
             Centang gejala yang tampak hari ini — sistem otomatis menilai risiko PMK & memberikan panduan tindakan.
+=======
+          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+            Pemeriksaan Kesehatan
+          </span>
+          <h1 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
+            Cek Kesehatan &amp; Tanda Sakit
+          </h1>
+          <p className="text-xs text-slate-600">
+            Periksa tanda fisik sapi untuk mendapatkan rekomendasi tindakan perawatan mandiri secara tepat.
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
           </p>
         </div>
 
-        {/* Tombol Simulasi Cepat untuk Demo Kompetisi */}
+        {/* Tombol Simulasi Cepat */}
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="mr-1 text-xs font-semibold text-slate-500">
-            Uji Cepat:
-          </span>
+          <span className="text-xs font-semibold text-slate-500">Uji Cepat:</span>
           <button
             type="button"
             onClick={() => applyDemoPreset("sehat")}
-            className="rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100"
+            className="rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800 hover:bg-emerald-100"
           >
-            Hijau (Sehat)
+            🟢 Normal
           </button>
           <button
             type="button"
             onClick={() => applyDemoPreset("waspada")}
-            className="rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-xs font-bold text-amber-800 hover:bg-amber-100"
+            className="rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-800 hover:bg-amber-100"
           >
-            Kuning (Waspada)
+            🟡 Waspada
           </button>
           <button
             type="button"
             onClick={() => applyDemoPreset("pmk")}
-            className="rounded-lg border border-rose-300 bg-rose-50 px-2.5 py-1.5 text-xs font-bold text-rose-800 hover:bg-rose-100"
+            className="rounded-lg border border-rose-300 bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-800 hover:bg-rose-100"
           >
-            Merah (Indikasi PMK)
+            🔴 Sakit PMK
           </button>
         </div>
       </div>
 
-      {/* Hasil Skrining Aktif + Laporan WA 1-Klik */}
+      {/* Hasil Skrining Aktif & Rekomendasi Tindakan Mandiri */}
       <HealthBadge
         status={healthStatus}
         variant="detailed"
@@ -168,24 +182,28 @@ export default function KesehatanPage() {
             : undefined
         }
         farmName={currentUser?.farmName}
-        vetClinicName={farmSettings.vetClinicName}
-        vetWhatsappNumber={farmSettings.vetWhatsappNumber}
+        vetContacts={farmSettings.vetContacts}
       />
 
       {/* Form Pemeriksaan Gejala Visual & Sinyal Data */}
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         <SectionCard
+<<<<<<< HEAD
           title="1. Gejala Fisik yang Terlihat Hari Ini"
           subtitle="Ketuk gejala yang tampak pada mulut, kuku, atau perilaku sapi"
           icon={<Stethoscope className="h-5 w-5" />}
+=======
+          title="1. Tanda Fisik Sapi"
+          subtitle="Centang gejala yang terlihat pada mulut, kuku, atau gaya berjalan sapi"
+          icon={<Stethoscope className="h-4 w-4 sm:h-5 sm:w-5" />}
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
           action={
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">
-              Pratinjau Skor: {livePreview.totalScore} poin (
-              {livePreview.riskLevel})
+            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-700">
+              Skor: {livePreview.totalScore} ({livePreview.riskLevel})
             </span>
           }
         >
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
             {CLINICAL_SYMPTOMS.map((symptom) => (
               <SymptomCheckCard
                 key={symptom.key}
@@ -203,68 +221,97 @@ export default function KesehatanPage() {
         </SectionCard>
 
         <SectionCard
+<<<<<<< HEAD
           title="2. Penurunan Nafsu Makan / Bobot"
           subtitle="Penurunan mendadak sering jadi tanda awal infeksi sebelum gejala fisik muncul"
           icon={<Activity className="h-5 w-5" />}
+=======
+          title="2. Nafsu Makan & Bobot"
+          subtitle="Deteksi awal jika pakan bersisa banyak atau bobot sapi susut"
+          icon={<Activity className="h-4 w-4 sm:h-5 sm:w-5" />}
+>>>>>>> ccb33949d804fff6fb02ca8881ad8726c40db81d
         >
-          <div className="space-y-5">
-            <AnomalySignalInputs
-              penurunanPakanPercent={formState.penurunanPakanPercent}
-              penurunanBobotPercent={formState.penurunanBobotPercent}
-              autoDetectedWeightDropPercent={autoDetectedWeightDropPercent}
-              onChangePakanDrop={(val) =>
+          <AnomalySignalInputs
+            penurunanPakanPercent={formState.penurunanPakanPercent}
+            penurunanBobotPercent={formState.penurunanBobotPercent}
+            autoDetectedWeightDropPercent={autoDetectedWeightDropPercent}
+            onChangePakanDrop={(val) =>
+              setFormState((prev) => ({
+                ...prev,
+                penurunanPakanPercent: val,
+              }))
+            }
+            onChangeBobotDrop={(val) =>
+              setFormState((prev) => ({
+                ...prev,
+                penurunanBobotPercent: val,
+              }))
+            }
+          />
+        </SectionCard>
+
+        {/* 3. Catatan Gejala Tambahan (Keluhan Bebas) */}
+        <SectionCard
+          title="3. Catatan Gejala Lainnya (Opsional)"
+          subtitle="Jika ada tanda sakit lain yang tidak ada di menu di atas"
+          icon={<FileText className="h-4 w-4 sm:h-5 sm:w-5" />}
+        >
+          <div className="space-y-3">
+            <textarea
+              rows={2}
+              value={formState.catatanTambahan || ""}
+              onChange={(e) =>
                 setFormState((prev) => ({
                   ...prev,
-                  penurunanPakanPercent: val,
+                  catatanTambahan: e.target.value,
                 }))
               }
-              onChangeBobotDrop={(val) =>
-                setFormState((prev) => ({
-                  ...prev,
-                  penurunanBobotPercent: val,
-                }))
-              }
+              placeholder="Contoh: perut kiri kembung kencang, batuk berdahak, mata berair/keruh, benjolan kulit..."
+              className="w-full rounded-xl border border-slate-200 bg-white p-3 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none"
             />
-
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-              <div className="text-xs text-slate-500">
-                Ternak diperiksa:{" "}
-                <strong className="text-slate-800">
-                  {profile.name}
-                  {activeBarnName ? ` (${activeBarnName})` : ""}
-                </strong>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isScreening}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-6 py-3 text-sm font-bold text-white shadow-xs transition-colors hover:bg-emerald-800 disabled:opacity-60 sm:w-auto"
-              >
-                <ClipboardCheck className="h-4 w-4" />
-                <span>
-                  {isScreening
-                    ? "Mengevaluasi Risiko..."
-                    : "Simpan & Evaluasi Status Kesehatan"}
-                </span>
-              </button>
-            </div>
+            <p className="text-[11px] text-slate-500">
+              Catatan ini berguna untuk riwayat harian atau bahan konsultasi langsung saat mantri langganan datang ke kandang.
+            </p>
           </div>
         </SectionCard>
+
+        {/* Tombol Simpan & Evaluasi */}
+        <div className="sticky bottom-16 z-20 rounded-2xl bg-white/95 p-3 shadow-lg ring-1 ring-slate-200 backdrop-blur-md sm:static sm:bg-transparent sm:p-0 sm:shadow-none sm:ring-0">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-xs text-slate-600 hidden sm:block">
+              Sapi diperiksa: <strong>{profile.name}</strong>
+              {activeBarnName ? ` (${activeBarnName})` : ""}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isScreening}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 py-3.5 px-6 text-sm font-extrabold text-white shadow-sm transition-colors hover:bg-emerald-800 disabled:opacity-60 sm:w-auto"
+            >
+              <ClipboardCheck className="h-5 w-5" />
+              <span>
+                {isScreening
+                  ? "Mengevaluasi..."
+                  : `Simpan & Cek Kesehatan (${profile.name})`}
+              </span>
+            </button>
+          </div>
+        </div>
       </form>
 
       {/* Riwayat Pemeriksaan Terakhir */}
       <SectionCard
-        title="Riwayat Pemeriksaan Kesehatan"
-        subtitle="Catatan skrining terbaru yang tersimpan pada perangkat"
-        icon={<History className="h-5 w-5" />}
+        title="Riwayat Pemeriksaan"
+        subtitle="Catatan pemeriksaan sebelumnya"
+        icon={<History className="h-4 w-4 sm:h-5 sm:w-5" />}
       >
         <div className="divide-y divide-slate-100">
           {healthHistory.map((item, idx) => (
             <div
               key={`${item.checkedAt}-${idx}`}
-              className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+              className="flex items-center justify-between gap-2 py-3 first:pt-0 last:pb-0"
             >
-              <div className="flex items-start gap-2.5">
+              <div className="flex items-start gap-2.5 min-w-0">
                 {item.riskLevel === "MERAH" ? (
                   <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
                 ) : (
@@ -276,8 +323,8 @@ export default function KesehatanPage() {
                     }`}
                   />
                 )}
-                <div>
-                  <p className="text-xs font-bold text-slate-900 sm:text-sm">
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-slate-900 truncate">
                     {item.summary}
                   </p>
                   <p className="text-[11px] text-slate-500">
