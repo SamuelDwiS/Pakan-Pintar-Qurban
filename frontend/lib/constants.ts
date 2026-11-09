@@ -15,10 +15,10 @@ export const API_BASE_URL =
 export const DEFAULT_DEMO_ACCOUNTS: StoredUserAccount[] = [
   {
     id: "user-peternak-01",
-    name: "Bpk. Slamet Riyadi",
+    name: "Bpk. Sutrisno",
     identifier: "peternak@pakanpintar.id",
     password: "password123",
-    farmName: "Peternakan Berkah Mandiri — Boyolali",
+    farmName: "Peternakan Berkah Mandiri — Sragen, Jawa Tengah",
   },
 ];
 
@@ -27,7 +27,11 @@ export const DEFAULT_DEMO_ACCOUNTS: StoredUserAccount[] = [
 export const DEFAULT_FARM_SETTINGS: FarmSettings = {
   defaultTargetDateQurban: "2027-05-17", // Estimasi Idul Adha 1448 H
   vetWhatsappNumber: "6281390375757",
-  vetClinicName: "Puskeswan / Medik Veteriner Terdekat",
+  vetClinicName: "Mantri Hewan / Puskeswan Terdekat",
+  // Data harga pasar kurban (dari wawancara lapangan Sragen 2026)
+  pricePerKwintalNormal: 55_000_000,       // Rp 55 jt/kwintal (hari biasa)
+  pricePerKwintalEid: 80_000_000,          // Rp 80 jt/kwintal (menjelang Idul Adha)
+  maxQurbanWeightKg: 700,                  // Bobot maks layak kurban: 7 kwintal
 };
 
 export const DEFAULT_BARNS: BarnItem[] = [
@@ -112,8 +116,11 @@ export const CATTLE_BREEDS = DEFAULT_BREEDS.map((b) => ({
   typicalMaxAdg: b.normalAdgKg,
 }));
 
-// Seed Database Pakan Lokal Sesuai SRS Section 3.2
+// Seed Database Pakan Lokal — Diperbarui berdasarkan wawancara peternak Sragen 2026
+// Referensi lapangan: 1 ember = ±3,6–4 kg / 1 sapi / sekali makan
+// Pakan nyata: Pollar Cilacap, NutriFeed, Ampas Tahu, Katul
 export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
+  // ── HIJAUAN ────────────────────────────────────────────────────────────────
   {
     id: "feed_1",
     name: "Rumput Lapang",
@@ -121,21 +128,79 @@ export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
     bkPercent: 24.4,
     pkPercent: 8.0,
     tdnPercent: 56.2,
-    maxLimitKg: 100.0,
+    maxLimitKg: 60.0,
     pricePerKg: 400,
     isActive: true,
   },
   {
     id: "feed_2",
-    name: "Rumput Gajah",
+    name: "Rumput Gajah / Odot",
     category: "Hijauan",
     bkPercent: 21.0,
     pkPercent: 9.5,
     tdnPercent: 55.0,
-    maxLimitKg: 100.0,
+    maxLimitKg: 60.0,
     pricePerKg: 500,
+    isActive: false,
+  },
+
+  // ── KONSENTRAT PABRIKAN (HASIL WAWANCARA LAPANGAN SRAGEN) ──────────────────
+  {
+    id: "feed_8",
+    name: "Pollar Cilacap (Dedak Gandum)",
+    category: "Konsentrat",
+    // Dedak gandum: BK ~88%, PK ~16%, TDN ~72% — referensi Hartadi et al.
+    bkPercent: 88.0,
+    pkPercent: 16.0,
+    tdnPercent: 72.0,
+    // Dosis lapangan: 1 piring ≈ 0,18 kg → biasanya 1-2 piring/sapi/makan
+    maxLimitKg: 1.0,
+    pricePerKg: 2500,
     isActive: true,
   },
+  {
+    id: "feed_9",
+    name: "NutriFeed Konsentrat",
+    category: "Konsentrat",
+    // Konsentrat komersial berbasis biji-bijian: BK ~87%, PK ~14%, TDN ~70%
+    bkPercent: 87.0,
+    pkPercent: 14.0,
+    tdnPercent: 70.0,
+    // Dosis lapangan: 5 piring ≈ 1,4 kg/sapi/makan
+    maxLimitKg: 2.5,
+    pricePerKg: 4500,
+    isActive: true,
+  },
+
+  // ── LIMBAH INDUSTRI PANGAN ─────────────────────────────────────────────────
+  {
+    id: "feed_7",
+    name: "Ampas Tahu Basah",
+    category: "Limbah Pertanian",
+    bkPercent: 14.5,
+    pkPercent: 20.0,
+    tdnPercent: 76.0,
+    // Lapangan: 5–6 piring ≈ 1,75–2 kg/sapi/makan; diberikan 2× sehari
+    maxLimitKg: 6.0,
+    pricePerKg: 1200,
+    isActive: true,
+  },
+
+  // ── BEKATUL / DEDAK ─────────────────────────────────────────────────────────
+  {
+    id: "feed_6",
+    name: "Katul / Bekatul Padi",
+    category: "Konsentrat",
+    bkPercent: 87.7,
+    pkPercent: 12.0,
+    tdnPercent: 67.9,
+    // Lapangan: 2 piring ≈ 0,33 kg/sapi/makan; 1 kg/hari sesuai wawancara
+    maxLimitKg: 2.0,
+    pricePerKg: 3600,
+    isActive: true,
+  },
+
+  // ── LIMBAH PERTANIAN LAIN (CADANGAN) ──────────────────────────────────────
   {
     id: "feed_3",
     name: "Bungkil Inti Sawit",
@@ -145,7 +210,7 @@ export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
     tdnPercent: 79.0,
     maxLimitKg: 4.0,
     pricePerKg: 1750,
-    isActive: true,
+    isActive: false,
   },
   {
     id: "feed_4",
@@ -156,40 +221,18 @@ export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
     tdnPercent: 51.2,
     maxLimitKg: 3.0,
     pricePerKg: 1000,
-    isActive: true,
+    isActive: false,
   },
   {
     id: "feed_5",
-    name: "Janggel Jagung",
+    name: "Janggel Jagung Giling",
     category: "Limbah Pertanian",
     bkPercent: 85.0,
     pkPercent: 3.4,
     tdnPercent: 52.0,
     maxLimitKg: 2.0,
     pricePerKg: 500,
-    isActive: true,
-  },
-  {
-    id: "feed_6",
-    name: "Dedak Padi Halus",
-    category: "Konsentrat",
-    bkPercent: 87.7,
-    pkPercent: 12.0,
-    tdnPercent: 67.9,
-    maxLimitKg: 4.0,
-    pricePerKg: 3600,
-    isActive: true,
-  },
-  {
-    id: "feed_7",
-    name: "Ampas Tahu",
-    category: "Konsentrat",
-    bkPercent: 14.5,
-    pkPercent: 20.0,
-    tdnPercent: 76.0,
-    maxLimitKg: 5.0,
-    pricePerKg: 1200,
-    isActive: true,
+    isActive: false,
   },
 ];
 
@@ -254,79 +297,67 @@ export const CLINICAL_SYMPTOMS: ClinicalSymptomMeta[] = [
 export const DEFAULT_CATTLE_LIST: CattleProfile[] = [
   {
     id: "sapi-qurban-01",
-    name: "Sapi 1",
+    name: "Sapi 1 (Jono)",
     barnId: "kandang-a",
     stallNumber: "Patok 01",
     breed: "Simental Cross",
     earTag: "Coklat kepala putih • Tag #014",
-    initialWeightKg: 295,
-    currentWeightKg: 325,
-    targetWeightKg: 485,
+    initialWeightKg: 350,
+    currentWeightKg: 388,
+    targetWeightKg: 550,
     startDate: "2026-10-01",
     targetDateQurban: "2027-05-17",
     weightLogs: [
       {
         id: "log-1",
         date: "2026-10-01",
-        weightKg: 295,
-        note: "Penimbangan awal masuk Kandang Utama A",
+        weightKg: 350,
+        note: "Penimbangan awal masuk kandang — adaptasi lingkungan baru",
       },
       {
         id: "log-2",
-        date: "2026-10-10",
-        weightKg: 303,
-        note: "Adaptasi pakan hijauan & konsentrat baik",
+        date: "2026-10-30",
+        weightKg: 378,
+        note: "Selesai masa adaptasi ±2 bulan, nafsu makan membaik",
       },
       {
         id: "log-3",
-        date: "2026-10-20",
-        weightKg: 312.5,
-        note: "Nafsu makan stabil 100%",
-      },
-      {
-        id: "log-4",
-        date: "2026-10-30",
-        weightKg: 321,
-        note: "Pemberian obat cacing rutin",
-      },
-      {
-        id: "log-5",
         date: "2026-11-05",
-        weightKg: 325,
-        note: "Penimbangan terbaru minggu ini",
+        weightKg: 388,
+        note: "PBBH rata-rata harian ±1 kg/hari sesuai lapangan",
       },
     ],
   },
   {
     id: "sapi-qurban-02",
-    name: "Sapi 2",
+    name: "Sapi 2 (Bagong)",
     barnId: "kandang-a",
     stallNumber: "Patok 02",
     breed: "Limousin Cross",
     earTag: "Merah bata polos • Tag #015",
-    initialWeightKg: 340,
-    currentWeightKg: 374,
-    targetWeightKg: 530,
-    startDate: "2026-09-25",
+    initialWeightKg: 400,
+    currentWeightKg: 436,
+    targetWeightKg: 600,
+    startDate: "2026-10-01",
     targetDateQurban: "2027-05-17",
     weightLogs: [
       {
         id: "log-s1",
-        date: "2026-09-25",
-        weightKg: 340,
+        date: "2026-10-01",
+        weightKg: 400,
         note: "Bakalan masuk Kandang Utama A",
       },
       {
         id: "log-s2",
-        date: "2026-10-12",
-        weightKg: 356,
-        note: "Respon konsentrat bungkil sawit sangat baik",
+        date: "2026-10-30",
+        weightKg: 420,
+        note: "Respon konsentrat NutriFeed sangat baik",
       },
       {
         id: "log-s3",
         date: "2026-11-05",
-        weightKg: 374,
-        note: "Pertumbuhan stabil sesuai target",
+        weightKg: 436,
+        note: "Pertumbuhan stabil ~1 kg/hari",
       },
     ],
   },
@@ -337,29 +368,29 @@ export const DEFAULT_CATTLE_LIST: CattleProfile[] = [
     stallNumber: "Koloni B",
     breed: "Peranakan Ongole (PO)",
     earTag: "Putih berpunuk besar",
-    initialWeightKg: 260,
-    currentWeightKg: 281,
-    targetWeightKg: 410,
+    initialWeightKg: 280,
+    currentWeightKg: 308,
+    targetWeightKg: 450,
     startDate: "2026-10-05",
     targetDateQurban: "2027-05-17",
     weightLogs: [
       {
         id: "log-j1",
         date: "2026-10-05",
-        weightKg: 260,
+        weightKg: 280,
         note: "Sapi PO lokal masuk penggemukan",
       },
       {
         id: "log-j2",
-        date: "2026-10-22",
-        weightKg: 271.5,
-        note: "Pemberian vitamin & mineral blok",
+        date: "2026-10-30",
+        weightKg: 299,
+        note: "Pemberian vitamin & katul ditingkatkan",
       },
       {
         id: "log-j3",
         date: "2026-11-05",
-        weightKg: 281,
-        note: "Kondisi sehat & lincah",
+        weightKg: 308,
+        note: "Kondisi sehat & lincah, kuku bersih",
       },
     ],
   },

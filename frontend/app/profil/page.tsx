@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useEffect, useMemo, useState } from "react";
+import React, { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Plus, Search, Sparkles, Warehouse } from "lucide-react";
@@ -43,16 +43,10 @@ function ProfilPageContent() {
 
   // State pencarian & filter pada menu daftar ternak
   const [searchQuery, setSearchQuery] = useState("");
-  const [barnFilter, setBarnFilter] = useState<string>(
-    initialBarnQuery || "ALL"
-  );
+  const [selectedBarnFilter, setSelectedBarnFilter] = useState<string | null>(null);
+  const barnFilter = selectedBarnFilter ?? (initialBarnQuery || "ALL");
+  const setBarnFilter = (val: string) => setSelectedBarnFilter(val);
   const [breedFilter, setBreedFilter] = useState<string>("ALL");
-
-  useEffect(() => {
-    if (initialBarnQuery) {
-      setBarnFilter(initialBarnQuery);
-    }
-  }, [initialBarnQuery]);
 
   // State modal CRUD (Create / Edit / Delete)
   const [crudModalOpen, setCrudModalOpen] = useState(false);

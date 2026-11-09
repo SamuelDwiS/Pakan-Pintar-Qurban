@@ -118,15 +118,11 @@ export default function KesehatanPage() {
       {/* Page Header & Quick Simulation Buttons */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
-            AI Engine 3 &bull; Sistem Pakar Mandiri KIAT VETINDO PMK Kementan RI
-          </span>
-          <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-            Skrining Dini Kesehatan Ternak
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+            Cek Kesehatan Sapi
           </h1>
-          <p className="mt-1 text-sm text-slate-600">
-            AI mengevaluasi gejala klinis &amp; anomali pakan secara mandiri,
-            serta menyiapkan laporan darurat WhatsApp 1-klik jika berisiko PMK.
+          <p className="mt-1 text-sm text-slate-500">
+            Centang gejala yang tampak hari ini — sistem otomatis menilai risiko PMK & memberikan panduan tindakan.
           </p>
         </div>
 
@@ -179,8 +175,8 @@ export default function KesehatanPage() {
       {/* Form Pemeriksaan Gejala Visual & Sinyal Data */}
       <form onSubmit={handleSubmit} className="space-y-6">
         <SectionCard
-          title="1. Checklist Gejala Klinis Visual"
-          subtitle="Ketuk pada gejala yang terlihat pada mulut, kuku, atau perilaku sapi hari ini"
+          title="1. Gejala Fisik yang Terlihat Hari Ini"
+          subtitle="Ketuk gejala yang tampak pada mulut, kuku, atau perilaku sapi"
           icon={<Stethoscope className="h-5 w-5" />}
           action={
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">
@@ -207,8 +203,8 @@ export default function KesehatanPage() {
         </SectionCard>
 
         <SectionCard
-          title="2. Deteksi Sinyal Anomali Data Harian"
-          subtitle="Penurunan konsumsi pakan atau susut bobot mendadak merupakan indikator awal infeksi sebelum gejala klinis muncul"
+          title="2. Penurunan Nafsu Makan / Bobot"
+          subtitle="Penurunan mendadak sering jadi tanda awal infeksi sebelum gejala fisik muncul"
           icon={<Activity className="h-5 w-5" />}
         >
           <div className="space-y-5">

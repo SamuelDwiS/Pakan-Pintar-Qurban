@@ -7,7 +7,6 @@ import {
   Activity,
   BookOpen,
   Calculator,
-  ChevronDown,
   ChevronRight,
   Database,
   Home,
@@ -233,7 +232,7 @@ export function NavbarHeader({
               {currentNav.label}
             </h2>
             <p className="truncate text-xs text-slate-500">
-              {currentNav.description}
+              {/* {currentNav.description} */}
             </p>
           </div>
         </div>
@@ -241,7 +240,7 @@ export function NavbarHeader({
         {/* Kanan: Engine Status, Panduan Istilah & Dropdown User Peternak */}
         <div className="flex shrink-0 items-center gap-2 lg:gap-2.5">
           {/* Engine Mode Pill */}
-          <div
+          {/* <div
             className={`hidden items-center gap-1.5 rounded-xl px-3 py-1.5 text-[11px] font-semibold ring-1 ring-inset xl:inline-flex ${
               apiMode === "backend"
                 ? "bg-emerald-50 text-emerald-800 ring-emerald-200"
@@ -259,7 +258,7 @@ export function NavbarHeader({
                 <span>Engine: AI Solver Mandiri PWA</span>
               </>
             )}
-          </div>
+          </div> */}
 
           {/* Panduan Istilah */}
           <button

@@ -20,7 +20,7 @@ import { CattleSelectorBar } from "@/components/ui/CattleSelectorBar";
 import { SectionCard } from "@/components/ui/SectionCard";
 import { StatMetricCard } from "@/components/ui/StatMetricCard";
 import { useAppState } from "@/context/AppStateContext";
-import { formatKg, formatRupiah } from "@/lib/formatters";
+import { formatKg, formatRupiah, formatTakaranKandang } from "@/lib/formatters";
 
 export default function RansumPage() {
   const {
@@ -109,15 +109,11 @@ export default function RansumPage() {
       {/* Header & Main Actions */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
-            AI Engine 1 &bull; Least-Cost Ration (Linear Programming NASEM/NRC)
-          </span>
-          <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-            Optimasi Ransum Pakan AI
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+            Rekomendasi Pakan Harian
           </h1>
-          <p className="mt-1 text-sm text-slate-600">
-            AI menyusun takaran bahan pakan lokal termurah per ekor maupun
-            akumulasi takaran belanja/adukan untuk 1 kandang sekaligus.
+          <p className="mt-1 text-sm text-slate-500">
+            Komposisi pakan lokal termurah yang memenuhi kebutuhan gizi sapi Anda hari ini.
           </p>
         </div>
 
@@ -196,9 +192,9 @@ export default function RansumPage() {
       {/* Collapsible Quick Stock & Price Adjuster */}
       {showQuickFeeds && (
         <SectionCard
-          title="Penyesuaian Cepat Stok & Harga Pakan Hari Ini"
-          subtitle="Centang bahan pakan yang ready di gudang kandang Anda, lalu klik Hitung Ulang AI"
-          icon={<Wheat className="h-5 w-5" />}
+            title="Penyesuaian Stok & Harga Pakan Hari Ini"
+            subtitle="Centang bahan yang ada di kandang, lalu klik Hitung Ulang"
+            icon={<Wheat className="h-5 w-5" />}
           action={
             <button
               type="button"
@@ -269,8 +265,8 @@ export default function RansumPage() {
           </div>
 
           <SectionCard
-            title={`Takaran Ransum Biaya Minimum — ${profile.name}`}
-            subtitle="Takaran pakan segar (As-Fed) siap timbang per hari beserta pemenuhan standar nutrisi NASEM/NRC"
+            title={`Takaran Pakan Harian — ${profile.name}`}
+            subtitle="Timbang dan berikan ke palung pakan setiap pagi & sore"
             icon={<Calculator className="h-5 w-5" />}
           >
             <RationTable
@@ -369,10 +365,10 @@ export default function RansumPage() {
                       <tr className="border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
                         <th className="pb-3 pr-4">Bahan Pakan Lokal</th>
                         <th className="pb-3 px-4 text-right">
-                          Total Timbang Segar (As-Fed)
+                          Total Timbang Segar
                         </th>
                         <th className="pb-3 px-4 text-right">
-                          Total Bahan Kering (BK)
+                          Takaran Kandang
                         </th>
                         <th className="pb-3 pl-4 text-right">
                           Subtotal Biaya / Hari
@@ -388,8 +384,10 @@ export default function RansumPage() {
                           <td className="py-3 px-4 text-right font-extrabold text-emerald-800">
                             {formatKg(item.totalAsFedKg, 2)}
                           </td>
-                          <td className="py-3 px-4 text-right text-slate-600">
-                            {formatKg(item.totalBkKg, 2)}
+                          <td className="py-3 px-4 text-right">
+                            <span className="inline-flex rounded-lg bg-amber-50 px-2 py-0.5 text-xs font-bold text-amber-800 ring-1 ring-inset ring-amber-200">
+                              {formatTakaranKandang(item.feedName, item.totalAsFedKg)}
+                            </span>
                           </td>
                           <td className="py-3 pl-4 text-right font-bold text-slate-900">
                             {formatRupiah(item.totalCostRp)}
@@ -405,8 +403,8 @@ export default function RansumPage() {
                         <td className="py-3 px-4 text-right">
                           {formatKg(barnRecap.totalAsFedDayKg, 2)}
                         </td>
-                        <td className="py-3 px-4 text-right">
-                          {formatKg(barnRecap.totalBkDayKg, 2)}
+                        <td className="py-3 px-4 text-right text-xs text-amber-900 font-bold">
+                          Total adukan konsentrat &amp; ampas
                         </td>
                         <td className="py-3 pl-4 pr-2 text-right">
                           {formatRupiah(barnRecap.totalCostPerDayRp)}

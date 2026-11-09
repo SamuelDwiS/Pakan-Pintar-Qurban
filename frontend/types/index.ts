@@ -42,6 +42,9 @@ export interface FarmSettings {
   defaultTargetDateQurban: string; // YYYY-MM-DD
   vetWhatsappNumber: string; // Contoh: 6281234567890
   vetClinicName: string; // Contoh: Puskeswan Kecamatan / Mantri Hewan
+  pricePerKwintalNormal?: number; // Rp per kwintal hari biasa (misal 55.000.000)
+  pricePerKwintalEid?: number; // Rp per kwintal jelang kurban (misal 80.000.000)
+  maxQurbanWeightKg?: number; // Bobot maks layak kurban (misal 700 kg = 7 kwintal)
 }
 
 export interface FeedItem {

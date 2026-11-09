@@ -163,8 +163,8 @@ export function CattleDetailView({
 
         <div className="lg:col-span-7">
           <SectionCard
-            title="Kurva Pertumbuhan Adaptif (AI Regresi)"
-            subtitle={`Proyeksi bobot spesifik untuk ${cattle.name}`}
+            title="Kurva Pertumbuhan & Target Harian"
+            subtitle={`Proyeksi bobot berkala untuk ${cattle.name}`}
             icon={<TrendingUp className="h-5 w-5" />}
           >
             <WeightChart profile={cattle} />

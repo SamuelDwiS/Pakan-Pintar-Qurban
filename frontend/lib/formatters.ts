@@ -43,3 +43,33 @@ export function formatDateTimeId(isoStr: string): string {
   }).format(d);
 }
 
+/**
+ * Konversi praktis takaran kandang lokal (Piring / Ember)
+ * Berdasarkan wawancara peternak Sragen:
+ * 1 Piring = 0.5 Liter (Pollar ~0.18 kg, NutriFeed ~0.28 kg, Katul ~0.165 kg, Ampas Tahu ~0.35 kg)
+ * 1 Ember = 5 Liter (Campuran konsentrat & ampas ~3.6 - 4 kg)
+ */
+export function formatTakaranKandang(feedName: string, asFedKg: number): string {
+  const lower = feedName.toLowerCase();
+  if (lower.includes("pollar")) {
+    const piring = asFedKg / 0.18;
+    return `±${piring.toFixed(1)} piring`;
+  }
+  if (lower.includes("nutrifeed")) {
+    const piring = asFedKg / 0.28;
+    return `±${piring.toFixed(1)} piring`;
+  }
+  if (lower.includes("ampas tahu")) {
+    const ember = asFedKg / 2.0;
+    return `±${ember.toFixed(1)} ember (${(asFedKg / 0.35).toFixed(0)} piring)`;
+  }
+  if (lower.includes("katul") || lower.includes("bekatul") || lower.includes("dedak")) {
+    const piring = asFedKg / 0.165;
+    return `±${piring.toFixed(1)} piring`;
+  }
+  if (lower.includes("rumput")) {
+    return `${formatKg(asFedKg, 1)} segar di palung`;
+  }
+  return formatKg(asFedKg, 1);
+}
+

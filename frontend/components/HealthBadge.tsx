@@ -121,7 +121,7 @@ export function HealthBadge({
           </div>
           <div>
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-              AI Expert System &bull; Standar KIAT VETINDO PMK Kementan RI
+              Standar Skrining KIAT VETINDO Kementan RI
             </span>
             <h3 className="mt-0.5 text-base font-extrabold text-slate-900 sm:text-lg">
               {cfg.title}
@@ -198,31 +198,35 @@ export function HealthBadge({
         </div>
 
         {status.riskLevel !== "HIJAU" && (
-          <div
-            className={`flex flex-wrap items-center justify-between gap-3 rounded-xl p-3.5 text-white ${
-              status.riskLevel === "MERAH" ? "bg-rose-600" : "bg-amber-600"
-            }`}
-          >
-            <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-              <MessageCircle className="h-5 w-5 shrink-0" />
-              <div>
-                <p className="font-bold">
-                  Laporan 1-Klik WhatsApp ke {vetClinicName}
-                </p>
-                <p className="text-xs opacity-90">
-                  Pesan ringkasan klinis disusun otomatis oleh AI (tanpa perlu
-                  akun dokter hewan).
-                </p>
-              </div>
-            </div>
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-lg bg-white px-3.5 py-2 text-xs font-bold text-slate-900 shadow-xs transition-colors hover:bg-slate-100"
+          <div className="space-y-2">
+            <div
+              className={`flex flex-wrap items-center justify-between gap-3 rounded-xl p-3.5 text-white ${
+                status.riskLevel === "MERAH" ? "bg-rose-600" : "bg-amber-600"
+              }`}
             >
-              Kirim WA Darurat &rarr;
-            </a>
+              <div className="flex items-center gap-2.5 text-xs sm:text-sm">
+                <MessageCircle className="h-5 w-5 shrink-0" />
+                <div>
+                  <p className="font-bold">
+                    Laporan 1-Klik WhatsApp ke {vetClinicName}
+                  </p>
+                  <p className="text-xs opacity-90">
+                    Kirim ringkasan gejala langsung ke mantri hewan / dokter langganan.
+                  </p>
+                </div>
+              </div>
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-lg bg-white px-3.5 py-2 text-xs font-bold text-slate-900 shadow-xs transition-colors hover:bg-slate-100"
+              >
+                Kirim WA Darurat &rarr;
+              </a>
+            </div>
+            <p className="text-[11px] text-slate-500 text-center">
+              💡 Acuan lapangan: suntik vaksin &amp; vitamin oleh mantri hewan berkisar &plusmn;Rp 60.000 / tindakan.
+            </p>
           </div>
         )}
       </div>

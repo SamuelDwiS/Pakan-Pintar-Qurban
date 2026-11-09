@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   CartesianGrid,
   Legend,
@@ -21,12 +21,14 @@ interface WeightChartProps {
   profile: CattleProfile;
 }
 
-export function WeightChart({ profile }: WeightChartProps) {
-  const [mounted, setMounted] = useState(false);
+const emptySubscribe = () => () => {};
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+export function WeightChart({ profile }: WeightChartProps) {
+  const mounted = React.useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   const { points, observedAdgKg, projectedFinalWeightKg } = useMemo(
     () => buildGrowthTrajectory(profile),

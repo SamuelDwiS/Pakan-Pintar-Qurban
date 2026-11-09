@@ -164,13 +164,13 @@ export function DesktopSidebar({
                             : "text-emerald-200/70"
                         }`}
                       >
-                        {item.shortLabel === "Beranda"
+                        {/* {item.shortLabel === "Beranda"
                           ? "Ringkasan & countdown"
                           : item.shortLabel === "Ternak"
                           ? "CRUD sapi & timbangan"
                           : item.shortLabel === "Ransum"
                           ? "Solver pakan termurah"
-                          : "Cek gejala PMK"}
+                          : "Cek gejala PMK"} */}
                       </p>
                     </div>
                   )}

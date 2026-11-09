@@ -48,6 +48,16 @@ export function CountdownCard({
     profile.targetWeightKg - profile.currentWeightKg
   );
 
+  const daysInBarn = profile.startDate
+    ? Math.max(
+        0,
+        Math.floor(
+          (new Date().getTime() - new Date(profile.startDate).getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
+      )
+    : 0;
+
   return (
     <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-800 p-5 text-white shadow-md sm:p-7">
       {/* Decorative Pattern */}
@@ -60,34 +70,33 @@ export function CountdownCard({
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur-xs">
               <CalendarClock className="h-3.5 w-3.5 text-emerald-200" />
-              Target Idul Adha: {formatIndonesianDate(profile.targetDateQurban)}
+              {formatIndonesianDate(profile.targetDateQurban)}
             </span>
 
             {barnName && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950/45 px-2.5 py-1 text-xs font-semibold text-emerald-100">
                 <Warehouse className="h-3 w-3 text-emerald-300" />
-                <span>
-                  {barnName}
-                  {profile.stallNumber ? ` • ${profile.stallNumber}` : ""}
-                </span>
+                <span>{barnName}</span>
               </span>
             )}
 
-            <span className="inline-flex items-center rounded-full bg-emerald-950/40 px-2.5 py-1 text-xs font-medium text-emerald-100">
-              {profile.breed}
-            </span>
+            {daysInBarn > 0 && daysInBarn <= 60 && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950/40 px-2.5 py-1 text-xs font-medium text-emerald-200">
+                🌱 Adaptasi Hari ke-{daysInBarn} (&plusmn;2 bln)
+              </span>
+            )}
           </div>
 
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-emerald-200">
-              Ternak Aktif: {profile.name}
+              {profile.name}
             </p>
             <div className="mt-1 flex flex-wrap items-baseline gap-3">
               <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
                 {daysToQurban} Hari Lagi
               </h1>
               <span className="text-sm font-medium text-emerald-100">
-                menuju hari pemotongan kurban
+                menuju hari kurban
               </span>
             </div>
           </div>
@@ -98,24 +107,22 @@ export function CountdownCard({
               <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-950/35 px-3.5 py-2 text-xs text-emerald-50 ring-1 ring-white/15 sm:text-sm">
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-300" />
                 <span>
-                  Target PBBH{" "}
+                  Target naik{" "}
                   <strong className="font-bold text-white">
                     {adgRequiredKg.toFixed(2)} kg/hari
                   </strong>{" "}
-                  realistis untuk {profile.breed} (&le;{maxBiologicalAdgKg}{" "}
-                  kg/hari)
+                  — realistis untuk {profile.breed}
                 </span>
               </div>
             ) : (
               <div className="inline-flex items-start gap-2 rounded-xl bg-amber-400/20 px-3.5 py-2.5 text-xs text-amber-50 ring-1 ring-amber-300/50 sm:text-sm">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
                 <span>
-                  Target PBBH{" "}
+                  Target{" "}
                   <strong className="font-bold text-white">
                     {adgRequiredKg.toFixed(2)} kg/hari
                   </strong>{" "}
-                  melebihi batas biologis {profile.breed} (~{maxBiologicalAdgKg}{" "}
-                  kg/hari). Sesuaikan target di menu Ternak.
+                  terlalu tinggi untuk {profile.breed} (maksimal ~{maxBiologicalAdgKg} kg/hari). Sesuaikan target di menu Ternak.
                 </span>
               </div>
             )}
