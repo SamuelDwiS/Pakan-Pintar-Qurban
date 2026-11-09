@@ -20,7 +20,7 @@ export function BottomMobileNav() {
   return (
     <nav
       aria-label="Navigasi Bawah HP"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-1.5 pb-safe pt-1.5 shadow-lg backdrop-blur-md md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200/90 bg-white/95 px-1.5 pb-[max(env(safe-area-inset-bottom),8px)] pt-1.5 shadow-lg backdrop-blur-md md:hidden"
     >
       <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
         {MOBILE_NAV_ITEMS.map((item) => {
@@ -34,25 +34,27 @@ export function BottomMobileNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`relative flex flex-col items-center justify-center gap-1 rounded-xl py-2 text-[10px] font-bold transition-colors ${
+              className={`relative flex min-h-[48px] flex-col items-center justify-center gap-1 rounded-xl py-1.5 text-[10px] font-extrabold transition-all active:scale-95 ${
                 isActive
-                  ? "bg-emerald-50/95 text-emerald-800"
-                  : "text-slate-500 hover:text-slate-900"
+                  ? "bg-emerald-700 text-white shadow-xs"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
               }`}
             >
               <div className="relative">
                 <Icon
                   className={`h-5 w-5 ${
-                    isActive ? "stroke-[2.4]" : "stroke-[1.9]"
+                    isActive ? "stroke-[2.5]" : "stroke-[1.8]"
                   }`}
                 />
                 {item.href === "/kesehatan" &&
                   (hasRedAlert || hasYellowAlert) && (
                     <span
-                      className={`absolute -right-1 -top-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-white ${
+                      className={`absolute -right-1 -top-0.5 h-2.5 w-2.5 rounded-full ring-2 ${
+                        isActive ? "ring-emerald-700" : "ring-white"
+                      } ${
                         hasRedAlert
-                          ? "animate-pulse bg-rose-600"
-                          : "bg-amber-500"
+                          ? "animate-pulse bg-rose-500"
+                          : "bg-amber-400"
                       }`}
                     />
                   )}

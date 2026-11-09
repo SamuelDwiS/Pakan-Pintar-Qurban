@@ -66,10 +66,27 @@ export function AnomalySignalInputs({
           className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-emerald-600"
         />
 
-        <div className="mt-2 flex justify-between text-[11px] text-slate-500">
-          <span>0% (Habis Normal)</span>
-          <span className="font-semibold text-amber-700">Batas &gt;20%</span>
-          <span>100% (Mogok Makan)</span>
+        {/* Quick Tap Chips for Mobile */}
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
+          {[
+            { label: "Normal (0%)", val: 0 },
+            { label: "Sisa Sedikit (10%)", val: 10 },
+            { label: "Turun (>20%)", val: 25 },
+            { label: "Mogok Makan (50%)", val: 50 },
+          ].map((chip) => (
+            <button
+              key={chip.val}
+              type="button"
+              onClick={() => onChangePakanDrop(chip.val)}
+              className={`rounded-lg px-2 py-1 text-[11px] font-bold transition-colors ${
+                penurunanPakanPercent === chip.val
+                  ? "bg-emerald-700 text-white"
+                  : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-100"
+              }`}
+            >
+              {chip.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -116,21 +133,37 @@ export function AnomalySignalInputs({
           className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-emerald-600"
         />
 
-        <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500">
-          <span>0% (Stabil/Naik)</span>
-          {autoDetectedWeightDropPercent > 0 ? (
+        {/* Quick Tap Chips for Mobile */}
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
+          {[
+            { label: "Normal (0%)", val: 0 },
+            { label: "Susut 1%", val: 1.0 },
+            { label: "Susut 2.5% (>2%)", val: 2.5 },
+          ].map((chip) => (
+            <button
+              key={chip.val}
+              type="button"
+              onClick={() => onChangeBobotDrop(chip.val)}
+              className={`rounded-lg px-2 py-1 text-[11px] font-bold transition-colors ${
+                penurunanBobotPercent === chip.val
+                  ? "bg-emerald-700 text-white"
+                  : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-100"
+              }`}
+            >
+              {chip.label}
+            </button>
+          ))}
+
+          {autoDetectedWeightDropPercent > 0 && (
             <button
               type="button"
               onClick={() => onChangeBobotDrop(autoDetectedWeightDropPercent)}
-              className="inline-flex items-center gap-1 font-semibold text-emerald-700 hover:underline"
+              className="inline-flex items-center gap-1 rounded-lg border border-emerald-300 bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-800 hover:bg-emerald-100"
             >
               <RefreshCw className="h-3 w-3" />
-              Isi dari Log ({autoDetectedWeightDropPercent}%)
+              Auto ({autoDetectedWeightDropPercent}%)
             </button>
-          ) : (
-            <span className="font-semibold text-amber-700">Batas &gt;2%</span>
           )}
-          <span>15%</span>
         </div>
       </div>
     </div>

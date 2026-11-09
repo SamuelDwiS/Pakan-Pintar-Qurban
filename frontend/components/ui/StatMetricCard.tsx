@@ -54,34 +54,34 @@ export function StatMetricCard({
 
   return (
     <div
-      className={`flex flex-col justify-between rounded-2xl border bg-white p-4 shadow-xs transition-all hover:shadow-sm sm:p-5 ${styles.ringBorder}`}
+      className={`flex flex-col justify-between rounded-2xl border bg-white p-3.5 sm:p-5 shadow-xs transition-all hover:shadow-sm ${styles.ringBorder}`}
     >
-      <div className="flex items-start justify-between gap-2">
-        <span className="text-xs font-medium text-slate-500 sm:text-sm">
+      <div className="flex items-start justify-between gap-1.5">
+        <span className="text-xs font-semibold text-slate-600 sm:text-sm">
           {label}
         </span>
         <div
-          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${styles.iconBg}`}
+          className={`flex h-7 w-7 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl ${styles.iconBg}`}
         >
           {icon}
         </div>
       </div>
 
-      <div className="mt-3">
-        <div className="flex flex-wrap items-baseline gap-2">
-          <p className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+      <div className="mt-2 sm:mt-3">
+        <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2">
+          <p className="text-base sm:text-2xl font-black tracking-tight text-slate-900">
             {value}
           </p>
           {badgeText && (
             <span
-              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset ${styles.badgeBg}`}
+              className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] sm:text-[11px] font-bold ring-1 ring-inset ${styles.badgeBg}`}
             >
               {badgeText}
             </span>
           )}
         </div>
         {subtext && (
-          <p className="mt-1 text-xs leading-relaxed text-slate-500">
+          <p className="mt-1 text-[11px] sm:text-xs text-slate-500 line-clamp-1 sm:line-clamp-none">
             {subtext}
           </p>
         )}
@@ -89,4 +89,3 @@ export function StatMetricCard({
     </div>
   );
 }
-

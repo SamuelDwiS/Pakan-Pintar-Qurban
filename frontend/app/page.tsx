@@ -40,8 +40,13 @@ export default function DashboardPage() {
       ? "amber"
       : "emerald";
 
+  const totalAsFedKg = optimizationResult.rationComposition.reduce(
+    (acc, item) => acc + item.amountAsFedKg,
+    0
+  );
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Quick Multi-Cattle Switcher */}
       <CattleSelectorBar />
 
@@ -55,67 +60,70 @@ export default function DashboardPage() {
         isAdgFeasible={optimizationResult.isAdgFeasible}
       />
 
-      {/* 4 KPI Summary Cards */}
-      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+      {/* 4 KPI Summary Cards (2x2 di HP, 4 kolom di Laptop) */}
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 lg:grid-cols-4">
         <StatMetricCard
-          label="Biaya Pakan Minimum"
+          label="Biaya Pakan"
           value={`${formatRupiah(optimizationResult.totalCostPerDayRp)}/hr`}
-          subtext={`Total s.d. kurban: ${formatRupiah(
-            optimizationResult.totalCostToQurbanRp
-          )}`}
-          icon={<Coins className="h-5 w-5" />}
+          subtext={`Total: ${formatRupiah(optimizationResult.totalCostToQurbanRp)}`}
+          icon={<Coins className="h-4 w-4 sm:h-5 sm:w-5" />}
           tone="emerald"
-          badgeText="AI Termurah"
+          badgeText="Hemat AI"
         />
 
         <StatMetricCard
-          label="Target PBBH (ADG)"
+          label="Target Naik Bobot"
           value={`${optimizationResult.adgRequiredKg.toFixed(2)} kg/hr`}
-          subtext={`Kenaikan dibutuhkan: ${formatKg(
+          subtext={`Kurang: ${formatKg(
             Math.max(0, profile.targetWeightKg - profile.currentWeightKg),
             1
           )}`}
-          icon={<TrendingUp className="h-5 w-5" />}
+          icon={<TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />}
           tone={optimizationResult.isAdgFeasible ? "sky" : "amber"}
           badgeText={
-            optimizationResult.isAdgFeasible ? "Realistis" : "Melebihi Batas"
+            optimizationResult.isAdgFeasible ? "Realistis" : "Batas Maks"
           }
         />
 
         <StatMetricCard
-          label="Asupan Bahan Kering"
-          value={`${optimizationResult.totalBkProvidedKg.toFixed(2)} kg/hr`}
-          subtext={`PK ${optimizationResult.totalPkProvidedKg.toFixed(
-            2
-          )} kg • TDN ${optimizationResult.totalTdnProvidedKg.toFixed(2)} kg`}
-          icon={<Wheat className="h-5 w-5" />}
+          label="Porsi Pakan Segar"
+          value={`${formatKg(totalAsFedKg, 1)}/hr`}
+          subtext="Rumput & konsentrat"
+          icon={<Wheat className="h-4 w-4 sm:h-5 sm:w-5" />}
           tone="slate"
-          badgeText="NASEM/NRC"
+          badgeText="Standar NRC"
         />
 
         <StatMetricCard
-          label="Status Risiko PMK"
-          value={`Level ${healthStatus.riskLevel}`}
-          subtext={`Skor KIAT VETINDO: ${healthStatus.totalScore} poin`}
-          icon={<Activity className="h-5 w-5" />}
+          label="Kondisi Sapi"
+          value={
+            healthStatus.riskLevel === "HIJAU"
+              ? "Sehat"
+              : healthStatus.riskLevel === "KUNING"
+              ? "Waspada"
+              : "Bahaya PMK"
+          }
+          subtext={`Skor: ${healthStatus.totalScore} poin`}
+          icon={<Activity className="h-4 w-4 sm:h-5 sm:w-5" />}
           tone={healthTone}
+          badgeText={healthStatus.riskLevel}
         />
       </div>
 
       {/* Main Analytics Grid: Growth Trajectory & Early Health Screening */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-12">
         <div className="lg:col-span-7">
           <SectionCard
-            title="Kurva Pertumbuhan & Proyeksi Kurban (AI Regresi)"
-            subtitle="Pemodelan regresi adaptif berdasarkan riwayat penimbangan berkala"
-            icon={<Scale className="h-5 w-5" />}
+            title="Grafik Kenaikan Bobot"
+            subtitle="Perkiraan bobot sampai hari Idul Adha"
+            icon={<Scale className="h-4 w-4 sm:h-5 sm:w-5" />}
             action={
               <Link
                 href={`/profil?detail=${encodeURIComponent(profile.id)}`}
-                className="inline-flex items-center gap-1 rounded-xl bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-200 transition-colors hover:bg-emerald-100"
+                className="inline-flex items-center gap-1 rounded-xl bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800 ring-1 ring-inset ring-emerald-200 transition-colors hover:bg-emerald-100"
               >
-                <span>Detail &amp; Bobot</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+                <span>Catat Timbang</span>
+                <ArrowRight className="h-3 w-3" />
               </Link>
             }
           >
@@ -125,35 +133,35 @@ export default function DashboardPage() {
 
         <div className="lg:col-span-5">
           <SectionCard
-            title="Skrining Kesehatan Mandiri"
-            subtitle={`Diperbarui: ${formatDateTimeId(healthStatus.checkedAt)}`}
-            icon={<Activity className="h-5 w-5" />}
+            title="Kondisi Kesehatan Terakhir"
+            subtitle={`Dicek: ${formatDateTimeId(healthStatus.checkedAt)}`}
+            icon={<Activity className="h-4 w-4 sm:h-5 sm:w-5" />}
             action={
               <Link
                 href="/kesehatan"
-                className="inline-flex items-center gap-1 rounded-xl bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-200"
+                className="inline-flex items-center gap-1 rounded-xl bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-200"
               >
-                <span>Cek Gejala</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+                <span>Cek Fisik</span>
+                <ArrowRight className="h-3 w-3" />
               </Link>
             }
           >
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-500">
-                  Indikator Saat Ini:
+                  Status Saat Ini:
                 </span>
                 <HealthBadge status={healthStatus} variant="compact" />
               </div>
 
-              <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Evaluasi Sistem Pakar AI
+              <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-3.5 sm:p-4">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  Ringkasan
                 </p>
-                <p className="mt-1.5 text-sm font-semibold text-slate-900">
+                <p className="mt-1 text-xs sm:text-sm font-bold text-slate-900">
                   {healthStatus.summary}
                 </p>
-                <p className="mt-2 text-xs leading-relaxed text-slate-600">
+                <p className="mt-1.5 text-xs leading-relaxed text-slate-600 line-clamp-2 sm:line-clamp-none">
                   {healthStatus.recommendedAction}
                 </p>
               </div>
@@ -163,7 +171,7 @@ export default function DashboardPage() {
                 className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/80 px-4 py-2.5 text-xs font-bold text-emerald-800 transition-colors hover:bg-emerald-100"
               >
                 <Activity className="h-4 w-4" />
-                <span>Lakukan Skrining Harian PMK</span>
+                <span>Periksa Kesehatan Sapi Hari Ini</span>
               </Link>
             </div>
           </SectionCard>
@@ -172,21 +180,19 @@ export default function DashboardPage() {
 
       {/* Active Least-Cost Ration Summary */}
       <SectionCard
-        title={`Racikan Pakan Lokal Biaya Minimum — ${profile.name}`}
-        subtitle={`Disusun otomatis untuk bobot ${formatKg(
+        title={`Menu Pakan Hari Ini — ${profile.name}`}
+        subtitle={`Porsi rumput & konsentrat untuk bobot ${formatKg(
           profile.currentWeightKg,
-          1
-        )} dengan target PBBH ${optimizationResult.adgRequiredKg.toFixed(
-          2
-        )} kg/hari`}
-        icon={<Calculator className="h-5 w-5" />}
+          0
+        )}`}
+        icon={<Calculator className="h-4 w-4 sm:h-5 sm:w-5" />}
         action={
           <Link
             href="/ransum"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-700 px-3.5 py-2 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-emerald-800"
+            className="inline-flex items-center gap-1 rounded-xl bg-emerald-700 px-3 py-1.5 text-xs font-bold text-white shadow-2xs transition-colors hover:bg-emerald-800"
           >
-            <span>Buka Menu Ransum &amp; Rekap Kandang</span>
-            <ArrowRight className="h-3.5 w-3.5" />
+            <span>Ubah Pakan</span>
+            <ArrowRight className="h-3 w-3" />
           </Link>
         }
       >

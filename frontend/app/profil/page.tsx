@@ -193,26 +193,25 @@ function ProfilPageContent() {
   // LEVEL 1: MENU CRUD DAFTAR HEWAN TERNAK (KANDANG)
   // =========================================================================
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Page Header & Create Button */}
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
-            Operasional Ternak &bull; Penomoran Otomatis &amp; Multi-Kandang
+          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+            Ternak &amp; Bobot
           </span>
-          <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-            Daftar Hewan Ternak Sapi
+          <h1 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
+            Daftar Sapi Kurban
           </h1>
-          <p className="mt-1 text-sm text-slate-600">
-            Tambah sapi baru (otomatis bernomor <strong>Sapi 1, Sapi 2</strong>{" "}
-            atau nama bebas), pilih penempatan kandang, dan pantau progres bobot.
+          <p className="text-xs text-slate-600">
+            Kelola sapi kurban, penempatan kandang, dan riwayat timbangan.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href="/master-kandang"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-xs font-bold text-slate-700 hover:bg-slate-50 sm:text-sm"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
           >
             <Warehouse className="h-4 w-4 text-emerald-700" />
             <span>Master Kandang</span>
@@ -221,10 +220,10 @@ function ProfilPageContent() {
           <button
             type="button"
             onClick={handleOpenCreateModal}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 text-xs font-bold text-white shadow-xs transition-colors hover:bg-emerald-800 sm:text-sm"
+            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-700 px-3.5 py-2 text-xs font-bold text-white shadow-xs transition-colors hover:bg-emerald-800"
           >
             <Plus className="h-4 w-4 stroke-[2.5]" />
-            <span>Tambah Sapi Baru</span>
+            <span>+ Tambah Sapi Baru</span>
           </button>
         </div>
       </div>
@@ -238,11 +237,11 @@ function ProfilPageContent() {
 
       {/* Daftar Kartu Sapi + Filter Kandang, Ras & Pencarian */}
       <SectionCard
-        title="Pilih Sapi untuk Melihat Detail Profil & Bobot"
-        subtitle="Klik 'Buka Detail Profil & Bobot' pada salah satu sapi untuk mencatat timbangan dan melihat grafik pertumbuhan"
+        title="Daftar Sapi"
+        subtitle="Pilih sapi untuk mencatat timbangan atau melihat grafik bobot"
         action={
-          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800 ring-1 ring-inset ring-emerald-200">
-            Menampilkan {filteredCattle.length} dari {cattleList.length} ekor
+          <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-800 ring-1 ring-inset ring-emerald-200">
+            {filteredCattle.length} dari {cattleList.length} ekor
           </span>
         }
       >

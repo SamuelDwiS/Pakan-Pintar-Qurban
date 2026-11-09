@@ -25,7 +25,7 @@ interface CattleProfileFormProps {
 }
 
 export function CattleProfileForm({ profile, onSave }: CattleProfileFormProps) {
-  const { barns, breeds } = useAppState();
+  const { barns, breeds, farmSettings } = useAppState();
   const [savedToast, setSavedToast] = useState(false);
 
   const {
@@ -213,14 +213,22 @@ export function CattleProfileForm({ profile, onSave }: CattleProfileFormProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700">
-            Target Tanggal Idul Adha
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="block text-xs font-semibold text-slate-700">
+              Target Tanggal Panen Kurban
+            </label>
+            <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800">
+              Kandang: {farmSettings.defaultTargetDateQurban}
+            </span>
+          </div>
           <input
             type="date"
             {...register("targetDateQurban", { required: "Wajib dipilih" })}
             className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
           />
+          <p className="mt-1 text-[11px] text-slate-500">
+            Sapi otomatis mengikuti target kurban kandang. Ubah hanya jika ada jadwal kirim pesanan khusus.
+          </p>
         </div>
       </div>
 

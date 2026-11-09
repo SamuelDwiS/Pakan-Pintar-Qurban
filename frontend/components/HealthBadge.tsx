@@ -2,11 +2,14 @@ import React from "react";
 import {
   AlertTriangle,
   CheckCircle2,
+  ListChecks,
   MessageCircle,
+  Phone,
   ShieldAlert,
 } from "lucide-react";
+import { DEFAULT_VET_CONTACTS } from "@/lib/constants";
 import { formatDateTimeId } from "@/lib/formatters";
-import type { HealthStatus, RiskLevel } from "@/types";
+import type { HealthStatus, RiskLevel, VetContactItem } from "@/types";
 
 interface HealthBadgeProps {
   status: HealthStatus;
@@ -14,8 +17,7 @@ interface HealthBadgeProps {
   cattleName?: string;
   barnName?: string;
   farmName?: string;
-  vetClinicName?: string;
-  vetWhatsappNumber?: string;
+  vetContacts?: VetContactItem[];
 }
 
 const LEVEL_STYLES: Record<
@@ -34,7 +36,7 @@ const LEVEL_STYLES: Record<
     dot: "bg-emerald-500",
     card: "border-emerald-200 bg-emerald-50/60",
     scoreBar: "bg-emerald-500",
-    title: "LEVEL HIJAU — SEHAT / NORMAL",
+    title: "SEHAT & NORMAL",
     Icon: CheckCircle2,
   },
   KUNING: {
@@ -42,7 +44,7 @@ const LEVEL_STYLES: Record<
     dot: "bg-amber-500",
     card: "border-amber-300 bg-amber-50/75",
     scoreBar: "bg-amber-500",
-    title: "LEVEL KUNING — WASPADA",
+    title: "WASPADA (Perlu Perhatian)",
     Icon: AlertTriangle,
   },
   MERAH: {
@@ -50,7 +52,7 @@ const LEVEL_STYLES: Record<
     dot: "bg-rose-600 animate-pulse",
     card: "border-rose-300 bg-rose-50/90",
     scoreBar: "bg-rose-600",
-    title: "LEVEL MERAH — BAHAYA / INDIKASI PMK",
+    title: "BAHAYA! INDIKASI PMK",
     Icon: ShieldAlert,
   },
 };
@@ -61,8 +63,7 @@ export function HealthBadge({
   cattleName,
   barnName,
   farmName,
-  vetClinicName = "Puskeswan / Medik Veteriner",
-  vetWhatsappNumber = "6281390375757",
+  vetContacts,
 }: HealthBadgeProps) {
   const cfg = LEVEL_STYLES[status.riskLevel] || LEVEL_STYLES.HIJAU;
   const Icon = cfg.Icon;
@@ -81,31 +82,16 @@ export function HealthBadge({
   }
 
   const meterPercent = Math.min(100, Math.round((status.totalScore / 80) * 100));
-
-  // Buat tautan laporan darurat WhatsApp 1-klik tanpa perlu login dokter hewan
-  const cleanWa = vetWhatsappNumber.replace(/[^0-9]/g, "") || "6281390375757";
-  const symptomsText =
-    status.triggeredIndicators && status.triggeredIndicators.length > 0
-      ? status.triggeredIndicators.join(", ")
-      : status.summary;
-  const waMessage = [
-    `*LAPORAN SKRINING DINI PMK — PAKAN PINTAR QURBAN*`,
-    `Peternakan: ${farmName || "Peternak Mandiri"}`,
-    `Identitas Sapi: ${cattleName || status.cattleId}`,
-    barnName ? `Lokasi Kandang: ${barnName}` : null,
-    `Status AI KIAT VETINDO: *${status.riskLevel} (Skor ${status.totalScore})*`,
-    `Gejala Terdeteksi: ${symptomsText}`,
-    `Mohon arahan pemeriksaan / tindakan lebih lanjut.`,
-  ]
-    .filter(Boolean)
-    .join("\n");
-
-  const whatsappHref = `https://wa.me/${cleanWa}?text=${encodeURIComponent(
-    waMessage
-  )}`;
+  const rawContacts =
+    vetContacts && vetContacts.length > 0
+      ? vetContacts
+      : DEFAULT_VET_CONTACTS;
+  const activeContacts = rawContacts.filter(
+    (c) => c.name.trim().length > 0 && c.phone.trim().length > 0
+  );
 
   return (
-    <div className={`rounded-2xl border p-5 ${cfg.card}`}>
+    <div className={`rounded-2xl border p-4 sm:p-5 ${cfg.card}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 rounded-xl bg-white p-2 shadow-2xs">
@@ -121,22 +107,22 @@ export function HealthBadge({
           </div>
           <div>
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-              AI Expert System &bull; Standar KIAT VETINDO PMK Kementan RI
+              Kondisi Sapi Hari Ini
             </span>
             <h3 className="mt-0.5 text-base font-extrabold text-slate-900 sm:text-lg">
               {cfg.title}
             </h3>
             <p className="mt-0.5 text-xs text-slate-500">
-              Pemeriksaan terakhir: {formatDateTimeId(status.checkedAt)}
+              Pemeriksaan: {formatDateTimeId(status.checkedAt)}
             </p>
           </div>
         </div>
 
-        <div className="rounded-xl bg-white px-3.5 py-2 text-right shadow-2xs">
+        <div className="rounded-xl bg-white px-3 py-1.5 text-right shadow-2xs sm:px-3.5 sm:py-2">
           <p className="text-[10px] font-semibold uppercase text-slate-400">
-            Total Skor Risiko
+            Skor Risiko
           </p>
-          <p className="text-xl font-black text-slate-900">
+          <p className="text-lg font-black text-slate-900 sm:text-xl">
             {status.totalScore}{" "}
             <span className="text-xs font-medium text-slate-400">poin</span>
           </p>
@@ -144,13 +130,13 @@ export function HealthBadge({
       </div>
 
       {/* Risk Threshold Meter */}
-      <div className="mt-4">
-        <div className="flex justify-between text-[11px] font-semibold text-slate-500">
+      <div className="mt-3.5 sm:mt-4">
+        <div className="flex justify-between text-[10px] font-semibold text-slate-500 sm:text-[11px]">
           <span>0 (Sehat)</span>
           <span>20 (Waspada)</span>
           <span>40+ (Bahaya PMK)</span>
         </div>
-        <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-white/90 ring-1 ring-slate-200/80">
+        <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-white/90 ring-1 ring-slate-200/80">
           <div
             className={`h-full rounded-full transition-all duration-500 ${cfg.scoreBar}`}
             style={{ width: `${Math.max(4, meterPercent)}%` }}
@@ -158,12 +144,12 @@ export function HealthBadge({
         </div>
       </div>
 
-      <div className="mt-4 space-y-3 rounded-xl bg-white/90 p-4 ring-1 ring-slate-200/60">
+      <div className="mt-3.5 space-y-3 rounded-xl bg-white/90 p-3.5 ring-1 ring-slate-200/60 sm:mt-4 sm:p-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
-            Ringkasan Evaluasi AI
+          <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
+            Keterangan
           </p>
-          <p className="mt-1 text-sm font-medium text-slate-800">
+          <p className="mt-1 text-xs font-semibold text-slate-800 sm:text-sm">
             {status.summary}
           </p>
         </div>
@@ -171,10 +157,10 @@ export function HealthBadge({
         {status.triggeredIndicators &&
           status.triggeredIndicators.length > 0 && (
             <div>
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                Gejala &amp; Sinyal Anomali Terdeteksi
+              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                Tanda yang Terlihat
               </p>
-              <ul className="mt-1.5 space-y-1">
+              <ul className="mt-1 space-y-1">
                 {status.triggeredIndicators.map((ind) => (
                   <li
                     key={ind}
@@ -188,41 +174,193 @@ export function HealthBadge({
             </div>
           )}
 
+        {status.catatanTambahan && (
+          <div className="rounded-lg bg-slate-50 p-2.5 text-xs text-slate-700">
+            <span className="font-bold text-slate-600">Catatan Lain Peternak:</span>{" "}
+            &ldquo;{status.catatanTambahan}&rdquo;
+          </div>
+        )}
+
+        {/* Rekomendasi Tindakan Operasional yang Harus Dilakukan */}
         <div className="border-t border-slate-100 pt-3">
-          <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
-            Protokol Penanganan Mandiri Peternak
-          </p>
-          <p className="mt-1 text-sm leading-relaxed text-slate-800">
+          <div className="flex items-center gap-1.5">
+            <ListChecks
+              className={`h-4.5 w-4.5 shrink-0 ${
+                status.riskLevel === "MERAH"
+                  ? "text-rose-600"
+                  : status.riskLevel === "KUNING"
+                  ? "text-amber-600"
+                  : "text-emerald-700"
+              }`}
+            />
+            <p className="text-xs sm:text-sm font-extrabold text-slate-900">
+              Rekomendasi Tindakan yang Harus Dilakukan:
+            </p>
+          </div>
+
+          <p className="mt-1 text-xs font-semibold text-slate-600">
             {status.recommendedAction}
           </p>
+
+          {status.actionSteps && status.actionSteps.length > 0 ? (
+            <div className="mt-2.5 space-y-2">
+              {status.actionSteps.map((step, idx) => (
+                <div
+                  key={idx}
+                  className={`flex items-start gap-2.5 rounded-xl p-2.5 text-xs sm:text-sm ${
+                    status.riskLevel === "MERAH"
+                      ? "border border-rose-200 bg-rose-50/80 text-rose-950"
+                      : status.riskLevel === "KUNING"
+                      ? "border border-amber-200 bg-amber-50/80 text-amber-950"
+                      : "border border-emerald-200 bg-emerald-50/80 text-emerald-950"
+                  }`}
+                >
+                  <span
+                    className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-lg text-[10px] font-black ${
+                      status.riskLevel === "MERAH"
+                        ? "bg-rose-600 text-white"
+                        : status.riskLevel === "KUNING"
+                        ? "bg-amber-600 text-white"
+                        : "bg-emerald-700 text-white"
+                    }`}
+                  >
+                    {idx + 1}
+                  </span>
+                  <span className="font-semibold leading-relaxed">{step}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-2 rounded-xl bg-slate-50 p-2.5 text-xs font-medium text-slate-700">
+              {status.recommendedAction}
+            </div>
+          )}
         </div>
 
-        {status.riskLevel !== "HIJAU" && (
-          <div
-            className={`flex flex-wrap items-center justify-between gap-3 rounded-xl p-3.5 text-white ${
-              status.riskLevel === "MERAH" ? "bg-rose-600" : "bg-amber-600"
-            }`}
-          >
-            <div className="flex items-center gap-2.5 text-xs sm:text-sm">
-              <MessageCircle className="h-5 w-5 shrink-0" />
-              <div>
-                <p className="font-bold">
-                  Laporan 1-Klik WhatsApp ke {vetClinicName}
-                </p>
-                <p className="text-xs opacity-90">
-                  Pesan ringkasan klinis disusun otomatis oleh AI (tanpa perlu
-                  akun dokter hewan).
+        {/* Edukasi Penanganan Mandiri saat Status Waspada (Kuning) */}
+        {status.riskLevel === "KUNING" && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50/90 p-3 text-xs text-amber-950">
+            <p className="font-bold flex items-center gap-1.5 text-amber-900">
+              <AlertTriangle className="h-4 w-4 text-amber-600" />
+              <span>Tahap Penanganan Mandiri Peternak (Observasi 1×24 Jam)</span>
+            </p>
+            <p className="mt-1 leading-relaxed text-amber-900/90">
+              Sapi terindikasi mengalami penurunan kondisi ringan. Lakukan langkah mandiri bernomor di atas terlebih dahulu. <strong>Belum perlu memanggil mantri/dokter hewan</strong> agar tidak membebani biaya suntik sebelum terbukti ada infeksi klinis. Tombol darurat WhatsApp akan otomatis aktif jika terdeteksi gejala bahaya (Merah).
+            </p>
+          </div>
+        )}
+
+        {/* Lapor Darurat WhatsApp ke Mantri (HANYA MUNCUL DI STATUS MERAH) */}
+        {status.riskLevel === "MERAH" && activeContacts.length > 0 && (
+          <div className="border-t border-slate-100 pt-3">
+            <div className="flex flex-wrap items-center justify-between gap-1.5">
+              <div className="flex items-center gap-1.5">
+                <MessageCircle className="h-4.5 w-4.5 shrink-0 text-rose-600" />
+                <p className="text-xs sm:text-sm font-extrabold text-slate-900">
+                  Kirim Laporan WA Darurat ke Mantri ({activeContacts.length} Kontak):
                 </p>
               </div>
+              <span className="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
+                Respon Cepat 1-Klik
+              </span>
             </div>
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-lg bg-white px-3.5 py-2 text-xs font-bold text-slate-900 shadow-xs transition-colors hover:bg-slate-100"
+
+            <p className="mt-1 text-[11px] text-slate-500">
+              Pesan terisi otomatis. Jika mantri utama berhalangan atau slow respon, Anda bisa langsung hubungi mantri lainnya:
+            </p>
+
+            <div
+              className={`mt-2.5 grid grid-cols-1 gap-2 ${
+                activeContacts.length === 1
+                  ? "max-w-xs"
+                  : activeContacts.length === 2
+                  ? "sm:grid-cols-2"
+                  : "sm:grid-cols-3"
+              }`}
             >
-              Kirim WA Darurat &rarr;
-            </a>
+              {activeContacts.map((contact) => {
+                const cleanPhone =
+                  contact.phone.replace(/[^0-9]/g, "") || "6281390375757";
+                const waText = [
+                  `*LAPORAN DARURAT KESEHATAN TERNAK — PAKAN PINTAR QURBAN*`,
+                  `Yth. ${contact.name}`,
+                  `Peternakan : ${farmName || "Peternakan Mandiri"}`,
+                  `Identitas Sapi : ${cattleName || status.cattleId}`,
+                  barnName ? `Lokasi Kandang : ${barnName}` : null,
+                  `Status AI : *${status.riskLevel} (Skor ${status.totalScore})*`,
+                  `Tanda Fisik : ${
+                    status.triggeredIndicators &&
+                    status.triggeredIndicators.length > 0
+                      ? status.triggeredIndicators.join(", ")
+                      : status.summary
+                  }`,
+                  status.catatanTambahan?.trim()
+                    ? `Catatan Tambahan Peternak : "${status.catatanTambahan.trim()}"`
+                    : null,
+                  `Mohon arahan / bantuan tindakan medis darurat. Terima kasih.`,
+                ]
+                  .filter(Boolean)
+                  .join("\n");
+
+                const href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
+                  waText
+                )}`;
+
+                return (
+                  <a
+                    key={contact.id}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex flex-col justify-between rounded-xl p-2.5 transition-all border shadow-2xs hover:shadow-sm ${
+                      contact.isPrimary
+                        ? "bg-rose-600 text-white border-rose-700 hover:bg-rose-700"
+                        : "bg-white text-slate-800 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1">
+                          <span className="font-extrabold text-xs truncate">
+                            {contact.name}
+                          </span>
+                        </div>
+                        {contact.roleNote && (
+                          <p
+                            className={`text-[10px] truncate mt-0.5 ${
+                              contact.isPrimary
+                                ? "text-white/80"
+                                : "text-slate-500"
+                            }`}
+                          >
+                            {contact.roleNote}
+                          </p>
+                        )}
+                      </div>
+                      {contact.isPrimary && (
+                        <span className="rounded-md bg-white/20 px-1.5 py-0.5 text-[9px] font-black uppercase text-white shrink-0">
+                          Utama
+                        </span>
+                      )}
+                    </div>
+
+                    <div
+                      className={`mt-2 flex items-center justify-between text-[11px] font-bold pt-1.5 border-t ${
+                        contact.isPrimary
+                          ? "border-white/20 text-white"
+                          : "border-slate-100 text-rose-700"
+                      }`}
+                    >
+                      <span className="flex items-center gap-1">
+                        <Phone className="h-3 w-3" />
+                        <span>{contact.phone}</span>
+                      </span>
+                      <span>Kirim WA &rarr;</span>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>

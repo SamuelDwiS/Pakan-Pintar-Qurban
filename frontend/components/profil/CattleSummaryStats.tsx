@@ -42,44 +42,43 @@ export function CattleSummaryStats({
   }).length;
 
   return (
-    <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 lg:grid-cols-4">
       <StatMetricCard
-        label="Populasi Kandang"
+        label="Populasi"
         value={`${totalCattle} Ekor`}
-        subtext="Sapi potong terdaftar di sistem"
-        icon={<Layers className="h-5 w-5" />}
+        subtext="Terdaftar di kandang"
+        icon={<Layers className="h-4 w-4 sm:h-5 sm:w-5" />}
         tone="emerald"
       />
 
       <StatMetricCard
-        label="Total Biaya Pakan Kandang"
+        label="Biaya Pakan"
         value={`${formatRupiah(totalBarnDailyCost)}/hr`}
-        subtext="Akumulasi ransum seluruh sapi"
-        icon={<Coins className="h-5 w-5" />}
+        subtext="Seluruh sapi kandang"
+        icon={<Coins className="h-4 w-4 sm:h-5 sm:w-5" />}
         tone="sky"
-        badgeText="Semua Sapi"
+        badgeText="Semua"
       />
 
       <StatMetricCard
-        label="Rata-Rata Progres Kurban"
+        label="Progres Kurban"
         value={`${avgProgressPercent}%`}
-        subtext="Capaian rata-rata menuju target bobot"
-        icon={<TrendingUp className="h-5 w-5" />}
+        subtext="Rata-rata target bobot"
+        icon={<TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />}
         tone="slate"
       />
 
       <StatMetricCard
-        label="Pantauan Kesehatan"
-        value={alertCount === 0 ? "Semua Sehat" : `${alertCount} Perlu Cek`}
+        label="Kesehatan"
+        value={alertCount === 0 ? "Semua Sehat" : `${alertCount} Cek`}
         subtext={
           alertCount === 0
-            ? "Seluruh ternak berstatus HIJAU"
-            : "Terdapat sapi berstatus Kuning/Merah"
+            ? "Seluruh ternak aman"
+            : "Ada sapi berisiko"
         }
-        icon={<Activity className="h-5 w-5" />}
+        icon={<Activity className="h-4 w-4 sm:h-5 sm:w-5" />}
         tone={alertCount === 0 ? "emerald" : "rose"}
       />
     </div>
   );
 }
-

@@ -21,8 +21,9 @@ import { MasterTabsNav } from "@/components/master/MasterTabsNav";
 import { SectionCard } from "@/components/ui/SectionCard";
 import { StatMetricCard } from "@/components/ui/StatMetricCard";
 import { useAppState } from "@/context/AppStateContext";
+import { DEFAULT_VET_CONTACTS } from "@/lib/constants";
 import { formatRupiah } from "@/lib/formatters";
-import type { BarnItem } from "@/types";
+import type { BarnItem, VetContactItem } from "@/types";
 
 export default function MasterKandangPage() {
   const {
@@ -45,8 +46,11 @@ export default function MasterKandangPage() {
   const [qurbanDate, setQurbanDate] = useState(
     farmSettings.defaultTargetDateQurban
   );
-  const [clinicName, setClinicName] = useState(farmSettings.vetClinicName);
-  const [waNumber, setWaNumber] = useState(farmSettings.vetWhatsappNumber);
+  const [contacts, setContacts] = useState<VetContactItem[]>(
+    farmSettings.vetContacts && farmSettings.vetContacts.length > 0
+      ? farmSettings.vetContacts
+      : DEFAULT_VET_CONTACTS
+  );
   const [settingsSaved, setSettingsSaved] = useState(false);
 
   const totalCapacity = barns.reduce((sum, b) => sum + b.capacity, 0);
@@ -85,12 +89,48 @@ export default function MasterKandangPage() {
     }
   };
 
+  const handleContactChange = (
+    index: number,
+    field: keyof VetContactItem,
+    value: string
+  ) => {
+    setContacts((prev) => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], [field]: value };
+      return copy;
+    });
+  };
+
+  const handleAddContact = () => {
+    if (contacts.length >= 3) return;
+    const newIdx = contacts.length + 1;
+    const newContact: VetContactItem = {
+      id: `vet-${Date.now()}`,
+      name: "",
+      phone: "",
+      roleNote:
+        newIdx === 2
+          ? "drh. Puskeswan / Medik Veteriner"
+          : "Mantri Inseminator / Cadangan",
+      isPrimary: false,
+    };
+    setContacts((prev) => [...prev, newContact]);
+  };
+
+  const handleRemoveContact = (index: number) => {
+    if (contacts.length <= 1) return; // Minimal harus ada 1 kontak mantri utama
+    setContacts((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
+    if (contacts.length === 0) return;
+    const primary = contacts.find((c) => c.isPrimary) || contacts[0];
     updateFarmSettings({
       defaultTargetDateQurban: qurbanDate,
-      vetClinicName: clinicName.trim() || "Puskeswan / Medik Veteriner Terdekat",
-      vetWhatsappNumber: waNumber.replace(/[^0-9]/g, "") || "6281390375757",
+      vetClinicName: primary?.name.trim() || "Mantri Hewan Terdekat",
+      vetWhatsappNumber: (primary?.phone || "6281390375757").replace(/[^0-9]/g, ""),
+      vetContacts: contacts,
     });
     setSettingsSaved(true);
     setTimeout(() => setSettingsSaved(false), 3000);
@@ -283,60 +323,159 @@ export default function MasterKandangPage() {
         subtitle="Digunakan untuk target tanggal default sapi baru serta pembuatan pesan laporan darurat otomatis jika terdeteksi gejala PMK (Merah)"
         icon={<Phone className="h-5 w-5" />}
       >
-        <form onSubmit={handleSaveSettings} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700">
-                Tanggal Idul Adha Default
-              </label>
-              <input
-                type="date"
-                required
-                value={qurbanDate}
-                onChange={(e) => setQurbanDate(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
-              />
+        <form onSubmit={handleSaveSettings} className="space-y-5">
+          {/* Target Idul Adha */}
+          <div className="max-w-md">
+            <label className="block text-xs font-semibold text-slate-700">
+              Target Tanggal Idul Adha Default
+            </label>
+            <input
+              type="date"
+              required
+              value={qurbanDate}
+              onChange={(e) => setQurbanDate(e.target.value)}
+              className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
+            />
+            <p className="mt-1 text-[11px] text-slate-500">
+              Menjadi acuan otomatis hitungan hari mundur (countdown) saat menambah sapi baru.
+            </p>
+          </div>
+
+          {/* Daftar Kontak Mantri / Dokter Hewan Langganan (Fleksibel 1-3 Kontak) */}
+          <div className="space-y-3 pt-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Daftar Kontak Mantri / Dokter Hewan ({contacts.length} Kontak)
+                </h3>
+                <p className="text-[11px] text-slate-500">
+                  Dihubungi via WhatsApp saat kondisi darurat kritis (Merah). Fleksibel jika hanya punya 1 mantri langganan.
+                </p>
+              </div>
+
+              {contacts.length < 3 && (
+                <button
+                  type="button"
+                  onClick={handleAddContact}
+                  className="inline-flex items-center gap-1 rounded-xl border border-dashed border-emerald-600 bg-emerald-50/80 px-3 py-1.5 text-xs font-bold text-emerald-800 transition-colors hover:bg-emerald-100"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>+ Tambah Mantri ({contacts.length}/3)</span>
+                </button>
+              )}
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700">
-                Nama Instansi / Mantri / Puskeswan Rujukan
-              </label>
-              <input
-                type="text"
-                required
-                value={clinicName}
-                onChange={(e) => setClinicName(e.target.value)}
-                placeholder="Contoh: Puskeswan Kec. Mojosongo"
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
-              />
-            </div>
+            <div
+              className={`grid grid-cols-1 gap-3 ${
+                contacts.length === 1
+                  ? "max-w-md"
+                  : contacts.length === 2
+                  ? "md:grid-cols-2"
+                  : "md:grid-cols-3"
+              }`}
+            >
+              {contacts.map((contact, idx) => {
+                const isFirst = idx === 0;
+                const priorityBadge = isFirst
+                  ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+                  : idx === 1
+                  ? "bg-sky-100 text-sky-800 border-sky-300"
+                  : "bg-slate-100 text-slate-700 border-slate-300";
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700">
-                Nomor WhatsApp Darurat (Format 628xxx)
-              </label>
-              <input
-                type="text"
-                required
-                value={waNumber}
-                onChange={(e) => setWaNumber(e.target.value)}
-                placeholder="6281390375757"
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
-              />
+                return (
+                  <div
+                    key={contact.id || idx}
+                    className="flex flex-col justify-between rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 transition-all hover:bg-slate-50"
+                  >
+                    <div className="space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <span
+                          className={`inline-block rounded-md border px-2 py-0.5 text-[10px] font-bold ${priorityBadge}`}
+                        >
+                          {idx === 0
+                            ? "Kontak 1 • Mantri Utama"
+                            : idx === 1
+                            ? "Kontak 2 • Puskeswan / Cadangan"
+                            : "Kontak 3 • Cadangan"}
+                        </span>
+
+                        {!isFirst && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveContact(idx)}
+                            className="rounded-lg p-1 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                            title="Hapus kontak ini"
+                            aria-label={`Hapus kontak ${idx + 1}`}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600">
+                          Nama Mantri / Instansi
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={contact.name}
+                          onChange={(e) =>
+                            handleContactChange(idx, "name", e.target.value)
+                          }
+                          placeholder={
+                            idx === 0 ? "Pak Mantri Budi" : "drh. Hendra"
+                          }
+                          className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600">
+                          Nomor WA (Format 628xxx)
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={contact.phone}
+                          onChange={(e) =>
+                            handleContactChange(idx, "phone", e.target.value)
+                          }
+                          placeholder="628123456789"
+                          className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600">
+                          Catatan / Peran
+                        </label>
+                        <input
+                          type="text"
+                          value={contact.roleNote || ""}
+                          onChange={(e) =>
+                            handleContactChange(idx, "roleNote", e.target.value)
+                          }
+                          placeholder="Contoh: Mantri Langganan Desa"
+                          className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:border-emerald-600 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
             {settingsSaved ? (
               <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700">
                 <Check className="h-4 w-4" />
-                Pengaturan musim kurban &amp; nomor WA berhasil disimpan!
+                Pengaturan musim kurban &amp; kontak mantri berhasil disimpan!
               </span>
             ) : (
               <span className="text-xs text-slate-500">
-                Tanpa perlu login dokter hewan — laporan gejala kritis dikirim
-                1-klik via WhatsApp peternak.
+                Tombol WhatsApp darurat hanya akan muncul saat status Bahaya (Merah). Status Waspada (Kuning) fokus pada penanganan mandiri peternak.
               </span>
             )}
 

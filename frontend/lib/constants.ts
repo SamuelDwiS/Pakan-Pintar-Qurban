@@ -6,6 +6,7 @@ import type {
   FeedItem,
   HealthStatus,
   StoredUserAccount,
+  VetContactItem,
 } from "@/types";
 
 export const API_BASE_URL =
@@ -24,10 +25,35 @@ export const DEFAULT_DEMO_ACCOUNTS: StoredUserAccount[] = [
 
 // ================= DATA MASTER BAWAAN =================
 
+export const DEFAULT_VET_CONTACTS: VetContactItem[] = [
+  {
+    id: "vet-1",
+    name: "Pak Mantri Budi",
+    phone: "6281390375757",
+    roleNote: "Mantri Langganan Utama (Desa)",
+    isPrimary: true,
+  },
+  {
+    id: "vet-2",
+    name: "drh. Hendra Wijaya",
+    phone: "6281234567890",
+    roleNote: "Puskeswan / Medik Veteriner Kecamatan",
+    isPrimary: false,
+  },
+  {
+    id: "vet-3",
+    name: "Pak Mantri Yanto",
+    phone: "6285678901234",
+    roleNote: "Mantri Cadangan (Suntik / IB)",
+    isPrimary: false,
+  },
+];
+
 export const DEFAULT_FARM_SETTINGS: FarmSettings = {
   defaultTargetDateQurban: "2027-05-17", // Estimasi Idul Adha 1448 H
   vetWhatsappNumber: "6281390375757",
   vetClinicName: "Puskeswan / Medik Veteriner Terdekat",
+  vetContacts: DEFAULT_VET_CONTACTS,
 };
 
 export const DEFAULT_BARNS: BarnItem[] = [
@@ -112,83 +138,72 @@ export const CATTLE_BREEDS = DEFAULT_BREEDS.map((b) => ({
   typicalMaxAdg: b.normalAdgKg,
 }));
 
-// Seed Database Pakan Lokal Sesuai SRS Section 3.2
+// Seed Database Pakan Lokal Sesuai Hasil Temuan Peternak di Lapangan
 export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
   {
-    id: "feed_1",
-    name: "Rumput Lapang",
-    category: "Hijauan",
-    bkPercent: 24.4,
-    pkPercent: 8.0,
-    tdnPercent: 56.2,
-    maxLimitKg: 100.0,
-    pricePerKg: 400,
-    isActive: true,
-  },
-  {
-    id: "feed_2",
-    name: "Rumput Gajah",
+    id: "feed_rumput",
+    name: "Rumput Segar",
     category: "Hijauan",
     bkPercent: 21.0,
     pkPercent: 9.5,
     tdnPercent: 55.0,
-    maxLimitKg: 100.0,
+    maxLimitKg: 40.0,
     pricePerKg: 500,
     isActive: true,
   },
   {
-    id: "feed_3",
-    name: "Bungkil Inti Sawit",
-    category: "Konsentrat",
-    bkPercent: 90.3,
-    pkPercent: 16.8,
-    tdnPercent: 79.0,
-    maxLimitKg: 4.0,
-    pricePerKg: 1750,
-    isActive: true,
-  },
-  {
-    id: "feed_4",
-    name: "Tumpi Jagung",
+    id: "feed_dami",
+    name: "Dami (Jerami Padi)",
     category: "Limbah Pertanian",
-    bkPercent: 88.3,
-    pkPercent: 8.87,
-    tdnPercent: 51.2,
-    maxLimitKg: 3.0,
-    pricePerKg: 1000,
+    bkPercent: 86.0,
+    pkPercent: 4.5,
+    tdnPercent: 43.0,
+    maxLimitKg: 8.0,
+    pricePerKg: 400,
     isActive: true,
   },
   {
-    id: "feed_5",
-    name: "Janggel Jagung",
-    category: "Limbah Pertanian",
-    bkPercent: 85.0,
-    pkPercent: 3.4,
-    tdnPercent: 52.0,
-    maxLimitKg: 2.0,
-    pricePerKg: 500,
-    isActive: true,
-  },
-  {
-    id: "feed_6",
-    name: "Dedak Padi Halus",
+    id: "feed_nutrifeed",
+    name: "Nutrifeed (Konsentrat)",
     category: "Konsentrat",
-    bkPercent: 87.7,
-    pkPercent: 12.0,
-    tdnPercent: 67.9,
-    maxLimitKg: 4.0,
-    pricePerKg: 3600,
+    bkPercent: 88.0,
+    pkPercent: 14.5,
+    tdnPercent: 70.0,
+    maxLimitKg: 6.0,
+    pricePerKg: 4200,
     isActive: true,
   },
   {
-    id: "feed_7",
+    id: "feed_polar",
+    name: "Bran Polar",
+    category: "Konsentrat",
+    bkPercent: 88.5,
+    pkPercent: 15.5,
+    tdnPercent: 74.0,
+    maxLimitKg: 4.5,
+    pricePerKg: 4000,
+    isActive: true,
+  },
+  {
+    id: "feed_katul",
+    name: "Katul (Dedak Padi)",
+    category: "Konsentrat",
+    bkPercent: 88.0,
+    pkPercent: 11.5,
+    tdnPercent: 65.0,
+    maxLimitKg: 4.0,
+    pricePerKg: 3200,
+    isActive: true,
+  },
+  {
+    id: "feed_ampas_tahu",
     name: "Ampas Tahu",
     category: "Konsentrat",
-    bkPercent: 14.5,
-    pkPercent: 20.0,
+    bkPercent: 14.0,
+    pkPercent: 22.0,
     tdnPercent: 76.0,
-    maxLimitKg: 5.0,
-    pricePerKg: 1200,
+    maxLimitKg: 10.0,
+    pricePerKg: 1000,
     isActive: true,
   },
 ];
@@ -373,9 +388,15 @@ export function createDefaultHealthStatus(cattleId: string): HealthStatus {
     totalScore: 0,
     riskLevel: "HIJAU",
     riskBadgeColor: "green",
-    summary: "Kondisi klinis dan nafsu makan ternak terpantau sehat/normal.",
+    summary: "SEHAT & NORMAL. Tidak ditemukan tanda fisik penyakit maupun mogok makan.",
     recommendedAction:
-      "Lanjutkan pemberian ransum harian terjadwal, jaga kebersihan kandang, dan lakukan penimbangan berkala.",
+      "Lanjutkan rutinitas pemberian pakan pokok (rumput & dami) serta adukan konsentrat harian.",
+    actionSteps: [
+      "Beri pakan segar & adukan konsentrat sesuai porsi hari ini (bagi 2x: pagi & sore).",
+      "Pastikan ketersediaan air minum bersih selalu penuh di bak/ember (ad libitum).",
+      "Bersihkan sisa pakan yang mulai masam di palungan setiap pagi.",
+      "Lakukan penimbangan berkala 1–2 minggu sekali untuk memantau tren target kurban.",
+    ],
     checkedAt: "2026-11-05T08:00:00.000Z",
     triggeredIndicators: [],
     source: "fallback",
