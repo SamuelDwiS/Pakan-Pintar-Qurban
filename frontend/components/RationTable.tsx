@@ -7,7 +7,7 @@ import {
   Utensils,
 } from "lucide-react";
 import { InfoAlert } from "@/components/ui/InfoAlert";
-import { formatKg, formatRupiah, formatTakaranKandang } from "@/lib/formatters";
+import { formatKg, formatRupiah } from "@/lib/formatters";
 import type { OptimizationResult } from "@/types";
 
 interface RationTableProps {
@@ -120,11 +120,11 @@ export function RationTable({
             <thead className="border-b border-slate-200 bg-slate-50 text-xs font-bold uppercase tracking-wider text-slate-600">
               <tr>
                 <th className="px-4 py-3">Bahan Pakan Lokal</th>
-                <th className="px-4 py-3 text-right">Takaran Timbang</th>
-                <th className="px-4 py-3 text-right">Takaran Kandang</th>
+                <th className="px-4 py-3 text-right">Takaran Segar (As-Fed)</th>
                 {!compact && (
                   <th className="px-4 py-3 text-right">Pagi / Sore (2x)</th>
                 )}
+                <th className="px-4 py-3 text-right">Bahan Kering (BK)</th>
                 <th className="px-4 py-3 text-right">Biaya / Hari</th>
               </tr>
             </thead>
@@ -134,7 +134,6 @@ export function RationTable({
                   totalAsFedKg > 0
                     ? Math.round((item.amountAsFedKg / totalAsFedKg) * 100)
                     : 0;
-                const takaranKandang = formatTakaranKandang(item.feedName, item.amountAsFedKg);
                 return (
                   <tr
                     key={item.feedId}
@@ -153,16 +152,14 @@ export function RationTable({
                         {formatKg(item.amountAsFedKg, 2)}
                       </span>
                     </td>
-                    <td className="px-4 py-3.5 text-right">
-                      <span className="inline-flex items-center rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-800 ring-1 ring-inset ring-amber-200">
-                        {takaranKandang}
-                      </span>
-                    </td>
                     {!compact && (
                       <td className="px-4 py-3.5 text-right text-xs font-medium text-slate-600">
                         2 &times; {formatKg(item.amountAsFedKg / 2, 2)}
                       </td>
                     )}
+                    <td className="px-4 py-3.5 text-right text-xs font-medium text-slate-600">
+                      {formatKg(item.amountBkKg, 2)}
+                    </td>
                     <td className="px-4 py-3.5 text-right font-semibold text-slate-900">
                       {formatRupiah(item.costRp)}
                     </td>
@@ -176,17 +173,17 @@ export function RationTable({
                 <td className="px-4 py-3 text-right text-emerald-800">
                   {formatKg(totalAsFedKg, 2)}
                 </td>
-                <td className="px-4 py-3 text-right text-xs font-bold text-amber-900">
-                  ±{((totalAsFedKg - (result.rationComposition.find(f => f.feedName.toLowerCase().includes("rumput"))?.amountAsFedKg || 0)) / 3.8).toFixed(1)} Ember adukan
-                </td>
                 {!compact && (
                   <td className="px-4 py-3 text-right text-xs font-semibold text-slate-600">
                     <span className="inline-flex items-center gap-1">
                       <Clock className="h-3.5 w-3.5" />
-                      Pagi &amp; Sore
+                      2 &times; {formatKg(totalAsFedKg / 2, 2)}
                     </span>
                   </td>
                 )}
+                <td className="px-4 py-3 text-right text-xs">
+                  {formatKg(result.totalBkProvidedKg, 2)}
+                </td>
                 <td className="px-4 py-3 text-right text-emerald-800">
                   {formatRupiah(result.totalCostPerDayRp)}
                 </td>

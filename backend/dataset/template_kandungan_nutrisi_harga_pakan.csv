@@ -1,0 +1,6 @@
+﻿feed_id,feed_name_as_sold,brand_or_supplier,dry_matter_pct_as_fed,crude_protein_pct_dm,tdn_pct_dm_or_energy_mj_kg_dm,nDF_pct_dm,price_rp_per_kg_as_fed,analysis_source,analysis_date,notes
+F001,Katul/bekatul padi,,,,,,,,,Isi dari hasil analisis atau referensi bahan yang benar-benar sesuai
+F002,Pollar/pollard,,,,,,,,,Periksa nama dan label produk
+F003,NutriFeed konsentrat,,,,,,,,,Foto label komposisi atau minta spesifikasi produsen
+F004,Ampas tahu,,,,,,,,,Ukur kadar bahan kering; ampas tahu basah sangat bervariasi
+F005,Hijauan/rumput yang diberikan,,,,,,,,,Belum ada takaran dalam wawancara

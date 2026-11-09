@@ -153,7 +153,7 @@ export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
     bkPercent: 88.0,
     pkPercent: 16.0,
     tdnPercent: 72.0,
-    // Dosis lapangan: 1 piring ≈ 0,18 kg → biasanya 1-2 piring/sapi/makan
+    // Dosis rekomendasi harian: ~0.5 - 1.0 kg/ekor/hari
     maxLimitKg: 1.0,
     pricePerKg: 2500,
     isActive: true,
@@ -166,7 +166,7 @@ export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
     bkPercent: 87.0,
     pkPercent: 14.0,
     tdnPercent: 70.0,
-    // Dosis lapangan: 5 piring ≈ 1,4 kg/sapi/makan
+    // Dosis rekomendasi harian: ~1.4 - 2.5 kg/ekor/hari
     maxLimitKg: 2.5,
     pricePerKg: 4500,
     isActive: true,
@@ -180,7 +180,7 @@ export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
     bkPercent: 14.5,
     pkPercent: 20.0,
     tdnPercent: 76.0,
-    // Lapangan: 5–6 piring ≈ 1,75–2 kg/sapi/makan; diberikan 2× sehari
+    // Dosis rekomendasi harian: ~3.5 - 6.0 kg/ekor/hari (diberikan 2x sehari)
     maxLimitKg: 6.0,
     pricePerKg: 1200,
     isActive: true,
@@ -194,7 +194,7 @@ export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
     bkPercent: 87.7,
     pkPercent: 12.0,
     tdnPercent: 67.9,
-    // Lapangan: 2 piring ≈ 0,33 kg/sapi/makan; 1 kg/hari sesuai wawancara
+    // Dosis rekomendasi harian: ~1.0 - 2.0 kg/ekor/hari
     maxLimitKg: 2.0,
     pricePerKg: 3600,
     isActive: true,

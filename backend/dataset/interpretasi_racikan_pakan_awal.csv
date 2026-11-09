@@ -1,0 +1,6 @@
+﻿ingredient,reported_kg_per_bucket_min,reported_kg_per_bucket_mid,reported_kg_per_bucket_max,derived_kg_per_day_min_or_mid,derivation,data_status,notes
+Pollar/pollard,0.18,0.18,0.18,0.24,0.18 kg/ember x 4 ember/3 hari,derived_from_interview,Nama/komposisi produk perlu konfirmasi label
+NutriFeed concentrate,1.4,1.4,1.4,1.8666666666666665,1.4 kg/ember x 4 ember/3 hari,derived_from_interview,Komposisi nutrisi belum diketahui
+Ampas tahu,1.75,1.875,2.0,2.5,nilai tengah (1.75-2.0) x 4 ember/3 hari,derived_from_interview,Kadar air dan bahan kering belum diukur
+Katul/bekatul padi,0.33,0.33,0.33,0.44,0.33 kg/ember x 4 ember/3 hari,derived_from_interview,Berbeda dengan keterangan terpisah 1 kg/hari; perlu klarifikasi
+TOTAL campuran,3.66,3.785,3.91,5.046666666666667,jumlah komponen; asumsi 4 ember/3 hari,derived_from_interview,Sekitar 5.05 kg/hari; total berbasis bobot ember yang dilaporkan 4.8-5.33 kg/hari

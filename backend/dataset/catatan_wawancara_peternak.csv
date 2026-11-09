@@ -1,0 +1,25 @@
+﻿field,value,unit_or_context,data_status,notes
+location,"Sragen, Jawa Tengah",lokasi wawancara,reported_by_farmer,Anonim; nama peternak tidak dicatat
+average_daily_gain,1.0,kg/hari,rough_farmer_estimate,Belum didukung catatan penimbangan bertanggal
+new_environment_adaptation,2,bulan,rough_farmer_estimate,Keterangan peternak; bukan parameter universal
+feed_katul,1.0,kg/ekor/hari,reported_by_farmer,Perlu diklarifikasi apakah diberikan terpisah dari racikan ember
+feed_pollard_brand,Pollar Cilacap,kemasan 50 kg,reported_by_farmer,"Nama dagang perlu difoto/cek label; kemungkinan pollard/dedak gandum, jangan diasumsikan komposisi nutrisinya"
+feed_nutrifeed_brand,NutriFeed,"konsentrat, kemasan 50 kg",reported_by_farmer,Komposisi label produk belum tersedia
+feed_tofu_dregs,Ampas tahu,1 ember (dalam racikan),reported_by_farmer,Kadar air sangat memengaruhi bobot dan nutrisi
+feed_rice_bran,Katul/bekatul padi,dalam racikan,reported_by_farmer,Perlu konfirmasi apakah sama dengan 1 kg/hari di atas
+bucket_volume,5,liter,reported_by_farmer,1 ember sekitar 5 liter
+plate_volume,0.5,liter,reported_by_farmer,"1 piring sekitar 0,5 liter"
+feeding_frequency,4,ember / 3 hari / ekor,reported_by_farmer,Asumsi hitung harian: 4/3 ember per hari
+mix_weight_per_bucket_min,3.6,kg/ember,reported_by_farmer,Perkiraan total racikan per ember
+mix_weight_per_bucket_max,4.0,kg/ember,reported_by_farmer,Perkiraan total racikan per ember
+pollar_per_bucket,0.18,kg/ember,reported_by_farmer,Dari 1 piring
+nutrifeed_per_bucket,1.4,kg/ember,reported_by_farmer,Dari 5 piring
+tofu_dregs_per_bucket_min,1.75,kg/ember,reported_by_farmer,Dari 5-6 piring
+tofu_dregs_per_bucket_max,2.0,kg/ember,reported_by_farmer,Dari 5-6 piring
+rice_bran_per_bucket,0.33,kg/ember,reported_by_farmer,Dari 2 piring
+pmk_history,2025,tahun,reported_by_farmer,Satu kejadian/riwayat ternak menurut keterangan peternak; bukan dataset diagnosis
+pmk_signs,nafsu makan turun; hipersalivasi; lemas/sulit berdiri; lepuh/luka,gejala,reported_by_farmer,Informasi gejala yang disebutkan peternak; bukan konfirmasi diagnosis pada kasus tertentu
+pmk_response,menghubungi mantri langganan; vaksinasi/pemantauan,tindakan yang dilaporkan,reported_by_farmer,Jadwal vaksinasi dan penanganan harus mengikuti otoritas veteriner
+reported_qurban_weight,7,kuintal,reported_by_farmer,Klaim lokal yang perlu diklarifikasi; bukan kriteria kelayakan qurban yang tervalidasi
+reported_price_iduladha,80 juta,rupiah/kuintal menurut catatan wawancara,reported_by_farmer,Satuan/harga sangat perlu dikonfirmasi; jangan dipakai untuk kalkulasi sebelum verifikasi
+reported_price_regular,55 juta,rupiah/kuintal menurut catatan wawancara,reported_by_farmer,Satuan/harga sangat perlu dikonfirmasi; jangan dipakai untuk kalkulasi sebelum verifikasi
