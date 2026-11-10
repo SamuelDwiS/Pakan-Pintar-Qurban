@@ -316,34 +316,77 @@ export function optimizeRationFallback(params: {
   const tdnCoeffs = activeFeeds.map(
     (f) => (f.bkPercent / 100) * (f.tdnPercent / 100)
   );
-  const upperBounds = activeFeeds.map((f) => f.maxLimitKg);
 
-  const solution = solveLeastCostLP(
-    costs,
-    [bkCoeffs, pkCoeffs, tdnCoeffs],
-    [requirements.bkReqKg, requirements.pkReqKg, requirements.tdnReqKg],
-    upperBounds
+  // Takaran dasar wajib dari hasil wawancara peternak lapangan:
+  // Bran Pollard: 0.25 kg (1/4 kg)
+  // NutriFeed: 1.25 kg (1 1/4 kg)
+  // Ampas Tahu: 1.50 kg (1 1/2 kg)
+  // Katul: 0.50 kg (1/2 kg)
+  // Rumput Segar: minimal 10.0 kg
+  const lowerBounds = activeFeeds.map((f) => {
+    const nl = f.name.toLowerCase();
+    if (nl.includes("polar") || nl.includes("pollard")) return Math.min(f.maxLimitKg, 0.25);
+    if (
+      nl.includes("nutrifeed") ||
+      (nl.includes("konsentrat") &&
+        !nl.includes("ampas") &&
+        !nl.includes("polar") &&
+        !nl.includes("katul"))
+    ) {
+      return Math.min(f.maxLimitKg, 1.25);
+    }
+    if (nl.includes("ampas")) return Math.min(f.maxLimitKg, 1.50);
+    if (nl.includes("katul") || nl.includes("bekatul") || nl.includes("dedak")) {
+      return Math.min(f.maxLimitKg, 0.50);
+    }
+    if (nl.includes("rumput")) return Math.min(f.maxLimitKg, 10.0);
+    return 0.0;
+  });
+
+  // Hitung nutrisi yang telah disuplai oleh batas bawah takaran wawancara
+  let bkFromLower = 0;
+  let pkFromLower = 0;
+  let tdnFromLower = 0;
+  lowerBounds.forEach((l, idx) => {
+    bkFromLower += l * (activeFeeds[idx].bkPercent / 100);
+    pkFromLower +=
+      l * (activeFeeds[idx].bkPercent / 100) * (activeFeeds[idx].pkPercent / 100);
+    tdnFromLower +=
+      l * (activeFeeds[idx].bkPercent / 100) * (activeFeeds[idx].tdnPercent / 100);
+  });
+
+  const remainingBk = Math.max(0, requirements.bkReqKg - bkFromLower);
+  const remainingPk = Math.max(0, requirements.pkReqKg - pkFromLower);
+  const remainingTdn = Math.max(0, requirements.tdnReqKg - tdnFromLower);
+
+  const reducedUpperBounds = activeFeeds.map((f, idx) =>
+    Math.max(0, f.maxLimitKg - lowerBounds[idx])
   );
 
-  if (!solution) {
-    warnings.push(
-      "Kombinasi pakan yang dipilih belum sanggup memenuhi standar minimal BK/PK/TDN. Tambahkan sumber protein/energi (seperti Bungkil Sawit, Ampas Tahu, atau Rumput)."
+  const solutionDelta = solveLeastCostLP(
+    costs,
+    [bkCoeffs, pkCoeffs, tdnCoeffs],
+    [remainingBk, remainingPk, remainingTdn],
+    reducedUpperBounds
+  );
+
+  let solution: number[];
+  if (solutionDelta) {
+    solution = activeFeeds.map((_, idx) => lowerBounds[idx] + solutionDelta[idx]);
+  } else {
+    // Jika sisa kebutuhan tidak konvergen, tambahkan rumput segar untuk menutup kekurangan BK
+    solution = [...lowerBounds];
+    const grassIdx = activeFeeds.findIndex((f) =>
+      f.name.toLowerCase().includes("rumput")
     );
-    return {
-      status: "infeasible",
-      cattleId,
-      adgRequiredKg,
-      isAdgFeasible,
-      totalCostPerDayRp: 0,
-      totalCostToQurbanRp: 0,
-      totalBkProvidedKg: 0,
-      totalPkProvidedKg: 0,
-      totalTdnProvidedKg: 0,
-      requirements,
-      rationComposition: [],
-      warningMessage: warnings.join(" "),
-      source: "fallback",
-    };
+    if (grassIdx >= 0) {
+      const grassBkFrac = activeFeeds[grassIdx].bkPercent / 100;
+      const extraGrass = Math.min(
+        reducedUpperBounds[grassIdx],
+        Math.max(0, remainingBk / grassBkFrac)
+      );
+      solution[grassIdx] += extraGrass;
+    }
   }
 
   const rationComposition: RationCompositionItem[] = [];

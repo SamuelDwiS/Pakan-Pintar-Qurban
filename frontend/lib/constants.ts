@@ -169,8 +169,8 @@ export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
     bkPercent: 88.0,
     pkPercent: 14.5,
     tdnPercent: 70.0,
-    maxLimitKg: 6.0,
-    pricePerKg: 4200,
+    maxLimitKg: 50.0,
+    pricePerKg: 2400, // 120k / 50kg (1/2 Kwintal)
     isActive: true,
   },
   {
@@ -180,8 +180,8 @@ export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
     bkPercent: 88.5,
     pkPercent: 15.5,
     tdnPercent: 74.0,
-    maxLimitKg: 4.5,
-    pricePerKg: 4000,
+    maxLimitKg: 50.0,
+    pricePerKg: 7000, // 350k / 50kg (1/2 Kwintal)
     isActive: true,
   },
   {
@@ -191,8 +191,8 @@ export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
     bkPercent: 88.0,
     pkPercent: 11.5,
     tdnPercent: 65.0,
-    maxLimitKg: 4.0,
-    pricePerKg: 3200,
+    maxLimitKg: 50.0,
+    pricePerKg: 3000, // 150k / 50kg (1/2 Kwintal)
     isActive: true,
   },
   {
@@ -202,8 +202,8 @@ export const DEFAULT_LOCAL_FEEDS: FeedItem[] = [
     bkPercent: 14.0,
     pkPercent: 22.0,
     tdnPercent: 76.0,
-    maxLimitKg: 10.0,
-    pricePerKg: 1000,
+    maxLimitKg: 25.0,
+    pricePerKg: 10000, // 50k / 1 Ember (4-5 Liter / ~5 kg)
     isActive: true,
   },
 ];

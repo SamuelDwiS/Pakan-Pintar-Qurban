@@ -72,28 +72,28 @@ NAMA_BAHAN = [
 DEFAULT_HARGA_BAHAN = {
     "Rumput Segar": 500.0,
     "Dami (Jerami Padi)": 400.0,
-    "Nutrifeed (Konsentrat)": 4200.0,
-    "Bran Polar": 4000.0,
-    "Katul (Dedak Padi)": 3200.0,
-    "Ampas Tahu": 1000.0,
+    "Nutrifeed (Konsentrat)": 2400.0,  # 120k / 50kg (1/2 Kwintal)
+    "Bran Polar": 7000.0,             # 350k / 50kg (1/2 Kwintal)
+    "Katul (Dedak Padi)": 3000.0,     # 150k / 50kg (1/2 Kwintal)
+    "Ampas Tahu": 10000.0,            # 50k / 1 Ember (4-5 Liter / ~5 kg)
 }
 
 DEFAULT_BATAS_MINIMUM = {
-    "Rumput Segar": 5.0,  # Minimal hijauan rumen
-    "Dami (Jerami Padi)": 0.0,
-    "Nutrifeed (Konsentrat)": 0.0,
-    "Bran Polar": 0.0,
-    "Katul (Dedak Padi)": 0.0,
-    "Ampas Tahu": 0.0,
+    "Rumput Segar": 10.0,              # Minimal hijauan rumen
+    "Dami (Jerami Padi)": 0.5,         # Minimal serat kasar
+    "Nutrifeed (Konsentrat)": 1.25,    # Wajib 1 1/4 kg sesuai hasil wawancara peternak
+    "Bran Polar": 0.25,               # Wajib 1/4 kg sesuai hasil wawancara peternak
+    "Katul (Dedak Padi)": 0.50,       # Wajib 1/2 kg sesuai hasil wawancara peternak
+    "Ampas Tahu": 1.50,               # Wajib 1 1/2 kg sesuai hasil wawancara peternak
 }
 
 DEFAULT_BATAS_MAKSIMUM = {
     "Rumput Segar": 40.0,
     "Dami (Jerami Padi)": 8.0,
-    "Nutrifeed (Konsentrat)": 6.0,
-    "Bran Polar": 4.5,
-    "Katul (Dedak Padi)": 4.0,
-    "Ampas Tahu": 10.0,
+    "Nutrifeed (Konsentrat)": 50.0,
+    "Bran Polar": 50.0,
+    "Katul (Dedak Padi)": 50.0,
+    "Ampas Tahu": 25.0,
 }
 
 # Nutrisi dasar bahan untuk perhitungan BK (Dry Matter), PK (Crude Protein), TDN (Energy)
@@ -358,8 +358,8 @@ def jalankan_optimasi_pakan(
         {"type": "ineq", "fun": lambda x: float(np.dot(roughage_coeffs, x)) - 0.28 * float(np.dot(bk_coeffs, x))},
     ]
 
-    # Tebakan awal realistis (20 kg rumput, 2 kg dami, 2 kg konsentrat, 1 kg polar, 1 kg katul, 3 kg ampas tahu)
-    x0 = np.array([20.0, 2.0, 2.0, 1.0, 1.0, 3.0])
+    # Tebakan awal realistis (20 kg rumput, 1.5 kg dami, 1.25 kg nutrifeed, 0.25 kg polar, 0.50 kg katul, 1.50 kg ampas tahu)
+    x0 = np.array([20.0, 1.5, 1.25, 0.25, 0.50, 1.50])
 
     hasil = minimize(
         objective_function,
@@ -399,8 +399,8 @@ def jalankan_optimasi_pakan(
             komposisi_optimal = np.maximum(0, res_lp.x)
             is_feasible = True
         else:
-            # Fallback proporsional seimbang peternak
-            komposisi_optimal = np.array([25.0, 2.5, 2.0, 1.0, 1.0, 4.0])
+            # Fallback komposisi wajib 4 konsentrat hasil wawancara peternak lapangan
+            komposisi_optimal = np.array([20.0, 1.5, 1.25, 0.25, 0.50, 1.50])
             is_feasible = False
             warning_msg = (warning_msg or "") + " Solusi LP terbatas; menggunakan komposisi pakan seimbang peternak."
     else:

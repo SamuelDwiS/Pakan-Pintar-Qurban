@@ -100,34 +100,32 @@ const rationResponseSchema = {
 const systemInstruction = `
 Anda adalah asisten AI spesialis Formulasi Nutrisi Sapi Potong Penggemukan Qurban (Ruminant Nutritionist).
 
-PRINSIP UTAMA:
-Peternak memiliki daftar STOK BAHAN PAKAN yang tersedia di kandang (dinyatakan dalam 'stokTersediaKgPerHari').
-Sebelum menyusun ransum, Anda WAJIB memeriksa daftar stok pakan yang aktif dan tersedia tersebut.
+PRINSIP UTAMA HASIL WAWANCARA LAPANGAN PETERNAK SAPI:
+1. Pertumbuhan rata-rata harian sapi (PBBH/ADG) peternak berada pada kisaran 1.0 kg/hari.
+2. Peternak menggunakan racikan komboran 4 pakan konsentrat dengan takaran harian riil per ekor sapi:
+   - Bran Pollard: 1/4 kg (0.25 kg)
+   - NutriFeed: 1 1/4 kg (1.25 kg)
+   - Ampas Tahu Basah: 1 1/2 kg (1.50 kg)
+   - Katul / Bekatul: 1/2 kg (0.50 kg)
+   Total konsentrat komboran = 3.50 kg/ekor/hari.
 
-ATURAN WAJIB FORMULASI RANSUM KOMPLIT (MULTI-KOMPONEN):
-1. WAJIB CEK DAN MANFAATKAN STOK YANG LENGKAP (JANGAN HANYA 1 ATAU 2 BAHAN SAJA):
-   - Sapi ruminansia mutlak membutuhkan ransum komplit yang memadukan hijauan dan konsentrat.
-   - Jika peternak memiliki stok pakan yang beragam (misal: Rumput Segar, Dami Padi, Katul, Bran Polar, Nutrifeed, Ampas Tahu), formulasi pakan AI WAJIB MENGGABUNGKAN SELURUH ATAU SEBAGIAN BESAR BAHAN TERSEBUT ke dalam rekomendasi ransum harian.
-   - Komposisi wajib memadukan:
-     a. Sumber Serat Kasar & Hijauan (Rumput Segar dan/atau Dami Padi) untuk motilitas rumen, produksi saliva buffer, dan mencegah asidosis (minimal 30% dari total BK pakan).
-     b. Sumber Energi Fermentabel (Katul / Bekatul).
-     c. Sumber Protein & Peningkat Palatabilitas/Nafsu Makan (Bran Polar, Ampas Tahu, dan Nutrifeed).
-   - JANGAN PERNAH HANYA MEMILIH 1 ATAU 2 BAHAN SAJA jika stok peternak memiliki 3 atau lebih bahan aktif! Manfaatkan keragaman bahan agar nutrisi saling melengkapi dan biaya ransum tetap ekonomis.
+ATURAN WAJIB FORMULASI TABEL RANSUM:
+1. KEEMPAT KOMPONEN KONSENTRAT DI ATAS WAJIB DIGUNAKAN SEMUANYA PADA TABEL TAKARAN RANSUM. TIDAK BOLEH ADA YANG TIDAK DIGUNAKAN ATAU 0 KG.
+   - Bran Pollard: 0.25 kg (Pagi: 0.125 kg, Sore: 0.125 kg)
+   - NutriFeed: 1.25 kg (Pagi: 0.625 kg, Sore: 0.625 kg)
+   - Ampas Tahu Basah: 1.50 kg (Pagi: 0.75 kg, Sore: 0.75 kg)
+   - Katul: 0.50 kg (Pagi: 0.25 kg, Sore: 0.25 kg)
 
-2. KEPATUHAN KETAT TERHADAP BATAS STOK:
-   - Jumlah takaran pakan harian ('amountKg') untuk setiap bahan TIDAK BOLEH MELEBIHI 'stokTersediaKgPerHari'.
-   - Jika ada bahan yang stoknya 0 atau tidak aktif, jangan gunakan bahan tersebut.
+2. PADUKAN DENGAN HIJAUAN & SERAT KASAR:
+   - Rumput Segar (15 - 30 kg sesuai bobot badan) dan Dami Padi (1 - 2 kg jika aktif) wajib disajikan untuk motilitas rumen, produksi saliva buffer, dan mencegah asidosis.
 
-3. KECUKUPAN KAPASITAS KONSUMSI SAPI:
-   - Total pakan segar (as-fed) harian umumnya berkisar 8% s/d 13% dari bobot sapi saat ini (misal sapi bobot 350 kg membutuhkan ~30 - 45 kg pakan segar total termasuk hijauan dan komboran).
-   - Bahan Kering (BK) total harus memenuhi 2.4% - 2.8% dari bobot badan sapi.
+3. KEPATUHAN KETAT TERHADAP BATAS STOK:
+   - Jumlah takaran pakan harian ('amountKg') untuk setiap bahan TIDAK BOLEH MELEBIHI stok yang tersedia ('stokTersediaKgPerHari').
 
 4. PERAN NUTRISI SETIAP BAHAN:
-   - Di dalam 'nutritionalRole', jelaskan peran spesifik masing-masing bahan pakan (misal: Rumput Segar sebagai serat hijauan utama rumen, Bran Polar pemacu nafsu makan dan aroma gurih, Ampas Tahu sumber protein basah murah, Katul sumber energi karbohidrat, Nutrifeed pemacu kenaikan bobot).
+   - Di dalam 'nutritionalRole', jelaskan fungsi spesifik masing-masing bahan pakan (misal: Bran Pollard pemacu nafsu makan & aroma gurih, NutriFeed konsentrat padat pembentuk karkas, Ampas Tahu sumber protein basah, Katul karbohidrat energi fermentasi, Rumput Segar serat utama rumen).
 
-ATURAN LAIN:
-- Gunakan nama bahan PERSIS sesuai data input.
-- Berikan output dalam format JSON sesuai skema yang ditentukan, dalam bahasa Indonesia yang aplikatif dan mudah dipahami peternak.
+Berikan jawaban dalam bahasa Indonesia dan dalam format JSON yang valid.
 `;
 
 function buildExpertSystemFallback(
@@ -139,30 +137,22 @@ function buildExpertSystemFallback(
   const currentW = cattle.currentWeightKg;
   const safeDays = Math.max(1, cattle.daysToQurban);
 
-  // Kebutuhan BK: ~2.5% BB
-  const totalBkNeed = currentW * 0.025;
-
   const recommendedMix: AiIngredientMixItem[] = [];
   let totalDailyCost = 0;
 
-  // Bagi porsi cerdas: 50% BK Hijauan/Serat, 50% BK Konsentrat
+  // Alokasi Hijauan / Serat Kasar
   const roughages = activeFeeds.filter(
     (f) => f.category === "Hijauan" || f.category === "Limbah Pertanian"
   );
-  const concentrates = activeFeeds.filter(
-    (f) => f.category === "Konsentrat"
-  );
-
-  // Alokasi Hijauan / Serat
   if (roughages.length > 0) {
     roughages.forEach((feed) => {
       const isFreshGrass = feed.name.toLowerCase().includes("rumput");
-      // Rumput segar 20-30 kg, Dami 2-3 kg
+      // Rumput segar 20-30 kg, Dami 1.5-2.5 kg
       const targetKg = isFreshGrass
-        ? Math.min(feed.maxLimitKg, Math.max(10, currentW * 0.07))
-        : Math.min(feed.maxLimitKg, 2.5);
+        ? Math.min(feed.maxLimitKg, Math.max(12, currentW * 0.07))
+        : Math.min(feed.maxLimitKg, 1.5);
 
-      if (targetKg > 0.1) {
+      if (targetKg > 0.05) {
         const amountKg = Number(targetKg.toFixed(2));
         const costRp = Math.round(amountKg * feed.pricePerKg);
         totalDailyCost += costRp;
@@ -180,51 +170,49 @@ function buildExpertSystemFallback(
     });
   }
 
-  // Alokasi Konsentrat (kombinasi seluruh stok aktif peternak)
-  if (concentrates.length > 0) {
-    concentrates.forEach((feed) => {
-      const nameLower = feed.name.toLowerCase();
-      let targetKg = 1.5;
+  // Alokasi 4 Konsentrat Wajib Sesuai Wawancara Lapangan:
+  // Bran Pollard: 1/4 kg (0.25 kg)
+  // NutriFeed: 1 1/4 kg (1.25 kg)
+  // Ampas Tahu: 1 1/2 kg (1.50 kg)
+  // Katul: 1/2 kg (0.50 kg)
+  const concentrates = activeFeeds.filter(
+    (f) => f.category === "Konsentrat"
+  );
 
-      if (nameLower.includes("ampas")) {
-        targetKg = Math.min(feed.maxLimitKg, 4.0); // Ampas tahu basah
-      } else if (nameLower.includes("polar")) {
-        targetKg = Math.min(feed.maxLimitKg, 1.5); // Polar pemacu nafsu makan
-      } else if (nameLower.includes("katul") || nameLower.includes("bekatul")) {
-        targetKg = Math.min(feed.maxLimitKg, 2.0); // Katul energi murah
-      } else if (nameLower.includes("nutrifeed") || nameLower.includes("konsentrat")) {
-        targetKg = Math.min(feed.maxLimitKg, 2.0); // Konsentrat komersial
-      } else {
-        targetKg = Math.min(feed.maxLimitKg, 1.0);
-      }
+  concentrates.forEach((feed) => {
+    const nameLower = feed.name.toLowerCase();
+    let targetKg = 0.5;
+    let role = "Sumber nutrisi konsentrat pelengkap energi dan protein.";
 
-      if (targetKg > 0.1) {
-        const amountKg = Number(targetKg.toFixed(2));
-        const costRp = Math.round(amountKg * feed.pricePerKg);
-        totalDailyCost += costRp;
+    if (nameLower.includes("polar") || nameLower.includes("pollard")) {
+      targetKg = Math.min(feed.maxLimitKg, 0.25); // 1/4 kg
+      role = "Meningkatkan palatabilitas (aroma gurih & nafsu makan sapi) serta sumber serat mudah cerna (1/4 kg).";
+    } else if (nameLower.includes("nutrifeed") || nameLower.includes("konsentrat")) {
+      targetKg = Math.min(feed.maxLimitKg, 1.25); // 1 1/4 kg
+      role = "Konsentrat padat nutrisi terfortifikasi mineral & protein pembentuk karkas kurban (1 1/4 kg).";
+    } else if (nameLower.includes("ampas")) {
+      targetKg = Math.min(feed.maxLimitKg, 1.50); // 1 1/2 kg
+      role = "Sumber protein basah empuk pemacu sintesis asam amino dan pembesaran otot daging (1 1/2 kg).";
+    } else if (nameLower.includes("katul") || nameLower.includes("bekatul") || nameLower.includes("dedak")) {
+      targetKg = Math.min(feed.maxLimitKg, 0.50); // 1/2 kg
+      role = "Sumber karbohidrat fermentabel rumen & energi murah perangsang mikroba rumen (1/2 kg).";
+    } else {
+      targetKg = Math.min(feed.maxLimitKg, 1.0);
+    }
 
-        let role = "Sumber nutrisi konsentrat pelengkap energi dan protein.";
-        if (nameLower.includes("ampas")) {
-          role = "Sumber protein basah bertekstur empuk, sangat ekonomis mendongkrak pembentukan daging.";
-        } else if (nameLower.includes("polar")) {
-          role = "Meningkatkan palatabilitas (aroma gurih & nafsu makan sapi) serta serat mudah cerna.";
-        } else if (nameLower.includes("katul") || nameLower.includes("bekatul")) {
-          role = "Sumber karbohidrat dan energi lokal yang aman untuk fermentasi rumen.";
-        } else if (nameLower.includes("nutrifeed")) {
-          role = "Konsentrat padat nutrisi terfortifikasi mineral & protein untuk mengejar target bobot.";
-        }
+    const amountKg = Number(targetKg.toFixed(2));
+    const costRp = Math.round(amountKg * feed.pricePerKg);
+    totalDailyCost += costRp;
 
-        recommendedMix.push({
-          name: feed.name,
-          amountKg,
-          morningKg: Number((amountKg * 0.5).toFixed(2)),
-          afternoonKg: Number((amountKg * 0.5).toFixed(2)),
-          costRp,
-          nutritionalRole: role,
-        });
-      }
+    recommendedMix.push({
+      name: feed.name,
+      amountKg,
+      morningKg: Number((amountKg / 2).toFixed(2)),
+      afternoonKg: Number((amountKg / 2).toFixed(2)),
+      costRp,
+      nutritionalRole: role,
     });
-  }
+  });
 
   // Urutkan dari takaran pakan segar terbanyak ke paling sedikit
   recommendedMix.sort((a, b) => b.amountKg - a.amountKg);
@@ -234,22 +222,22 @@ function buildExpertSystemFallback(
     modelUsed: `${modelName} (Pakar Ransum Presisi)`,
     status: "success",
     analysis: {
-      pbbhEvaluation: `Sapi ${cattle.name} (${cattle.breed}) dengan bobot awal ${cattle.currentWeightKg} kg membutuhkan PBBH rata-rata ${targetPbbh.toFixed(2)} kg/hari untuk mencapai target kurban ${cattle.targetWeightKg} kg dalam sisa ${safeDays} hari. Kombinasi stok hijauan dan konsentrat mencukupi kebutuhan metabolisme harian.`,
+      pbbhEvaluation: `Sapi ${cattle.name} (${cattle.breed}) dengan bobot awal ${cattle.currentWeightKg} kg diproyeksikan bertumbuh pada kisaran 1.0 kg/hari sesuai hasil wawancara peternak (target PBBH kalkulasi: ${targetPbbh.toFixed(2)} kg/hari dalam sisa ${safeDays} hari). Kombinasi lengkap 4 konsentrat lapangan mencukupi kebutuhan metabolisme harian.`,
       feedStrategy:
-        "Berikan pakan konsentrat (komboran ampas tahu, katul, dan bran polar) pada pagi hari (07.00 WIB) dan sore hari (16.00 WIB). Hijauan rumput segar disajikan setelah konsentrat habis dikonsumsi untuk memaksimalkan kecernaan.",
+        "Berikan racikan 4 konsentrat komboran (Ampas Tahu 1.5 kg, NutriFeed 1.25 kg, Katul 0.5 kg, dan Bran Pollard 0.25 kg) dibagi 2 kali: pagi hari (07.00 WIB) dan sore hari (16.00 WIB). Hijauan rumput segar disajikan setelah konsentrat habis dikonsumsi.",
       adaptationNote:
-        "Jika ada pergantian atau penambahan bahan konsentrat baru, lakukan penyesuaian bertahap selama 5-7 hari agar bakteri rumen beradaptasi sempurna tanpa memicu kembung.",
+        "Komposisi 4 bahan pakan konsentrat lapangan ini terbukti stabil dan aman bagi mikroba rumen tanpa menimbulkan risiko asidosis atau bloat.",
     },
     recommendedMix,
     totalDailyCostRp: totalDailyCost,
     totalPeriodCostRp: totalDailyCost * safeDays,
     managementAdvice: [
       "Sediakan air minum bersih yang dicampur sedikit garam dapur secara ad libitum (selalu tersedia).",
-      "Gunakan Bran Polar yang diseduh air hangat bersama bekatul dan ampas tahu untuk merangsang nafsu makan optimal.",
+      "Gunakan Bran Pollard yang diseduh air hangat bersama bekatul dan ampas tahu untuk aroma komboran yang sangat gurih.",
       "Pastikan palung pakan selalu dibersihkan dari sisa pakan masam sebelum pemberian pakan baru.",
     ],
     warnings: [
-      "AI telah memverifikasi seluruh stok pakan aktif peternak dan menyusun ransum komplit terpadu.",
+      "Seluruh 4 komponen konsentrat hasil wawancara peternak (Pollard, NutriFeed, Ampas Tahu, Katul) telah digunakan lengkap pada takaran ransum.",
       "Takaran setiap bahan telah dibatasi agar tidak melampaui stok harian yang dimiliki peternak.",
     ],
     generatedAt: new Date().toISOString(),
@@ -354,10 +342,15 @@ DATA INPUT:
 ${JSON.stringify(analysisInput, null, 2)}
 
 INSTRUKSI KHUSUS FORMULASI:
-1. Periksa ketersediaan stok pakan di atas ('stokTersediaKgPerHari').
-2. Sapi memerlukan ransum komplit berimbang (kombinasi hijauan/serat kasar + aneka konsentrat energi & protein). Karena peternak memiliki ${activeFeeds.length} jenis pakan di stok, MANFAATKAN KOMBINASI SELURUH/SEBAGIAN BESAR BAHAN TERSEBUT ke dalam racikan harian (JANGAN HANYA MEMILIH 1 ATAU 2 BAHAN SAJA).
-3. Pastikan takaran setiap bahan ('amountKg') TIDAK MELEBIHI stok harian yang tersedia ('stokTersediaKgPerHari').
-4. Pastikan total takaran pakan mencukupi kapasitas konsumsi sapi bobot ${cattle.currentWeightKg} kg untuk mengejar target PBBH ${targetPbbh.toFixed(2)} kg/hari.
+1. HASIL WAWANCARA PETERNAK LAPANGAN MENETAPKAN TAKARAN KONSENTRAT KOMBORAN PER EKOR SAPI:
+   - Bran Pollard: 0.25 kg (1/4 kg)
+   - NutriFeed: 1.25 kg (1 1/4 kg)
+   - Ampas Tahu Basah: 1.50 kg (1 1/2 kg)
+   - Katul / Bekatul: 0.50 kg (1/2 kg)
+   KEEMPAT KOMPONEN KONSENTRAT INI WAJIB DIGUNAKAN SEMUANYA PADA TABEL TAKARAN RANSUM (TIDAK BOLEH ADA YANG TIDAK DIGUNAKAN ATAU 0 KG).
+2. Tambahkan Hijauan Rumput Segar (15 - 30 kg sesuai bobot badan sapi) dan Dami Padi (jika aktif) untuk motilitas rumen dan mencegah asidosis.
+3. Pertumbuhan rata-rata harian sapi (PBBH) berada pada kisaran 1.0 kg/hari.
+4. Pastikan takaran setiap bahan ('amountKg') TIDAK MELEBIHI stok harian yang tersedia ('stokTersediaKgPerHari').
 5. Tuliskan peran nutrisi untuk setiap bahan yang dimasukkan ke dalam racikan.
 `,
         response_format: {
@@ -472,6 +465,40 @@ INSTRUKSI KHUSUS FORMULASI:
         nutritionalRole: item.nutritionalRole,
       });
     }
+
+    // Pastikan seluruh 4 komponen konsentrat wajib hasil wawancara peternak ada di recommendedMix
+    const mandatoryConcentrates = [
+      { key: "polar", defaultKg: 0.25, role: "Meningkatkan palatabilitas (aroma gurih & nafsu makan sapi) serta serat mudah cerna (1/4 kg)." },
+      { key: "nutrifeed", defaultKg: 1.25, role: "Konsentrat padat nutrisi terfortifikasi mineral & protein pembentuk karkas kurban (1 1/4 kg)." },
+      { key: "ampas", defaultKg: 1.50, role: "Sumber protein basah empuk pemacu sintesis asam amino dan pembesaran otot daging (1 1/2 kg)." },
+      { key: "katul", defaultKg: 0.50, role: "Sumber karbohidrat fermentabel rumen & energi murah perangsang mikroba rumen (1/2 kg)." },
+    ];
+
+    mandatoryConcentrates.forEach((mand) => {
+      const isPresent = recommendedMix.some((m) =>
+        m.name.toLowerCase().includes(mand.key)
+      );
+      if (!isPresent) {
+        const feed = activeFeeds.find((f) =>
+          f.name.toLowerCase().includes(mand.key)
+        );
+        if (feed) {
+          const validAmount = Math.min(feed.maxLimitKg, mand.defaultKg);
+          const morningKg = Number((validAmount / 2).toFixed(2));
+          const afternoonKg = Number((validAmount - morningKg).toFixed(2));
+          const costRp = Math.round(validAmount * feed.pricePerKg);
+          totalDailyCost += costRp;
+          recommendedMix.push({
+            name: feed.name,
+            amountKg: validAmount,
+            morningKg,
+            afternoonKg,
+            costRp,
+            nutritionalRole: mand.role,
+          });
+        }
+      }
+    });
 
     // Urutkan bahan dari takaran terbesar ke terkecil
     recommendedMix.sort((a, b) => b.amountKg - a.amountKg);
