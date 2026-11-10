@@ -239,7 +239,7 @@ export function RationTable({
         <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-3.5 sm:p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
-              Kecukupan Nutrisi (Standar Standar Internasional)
+              Kecukupan Nutrisi (Standar Kearl / NASEM-NRC Tropis)
             </h3>
             <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">
               <CheckCircle2 className="h-4 w-4" />
