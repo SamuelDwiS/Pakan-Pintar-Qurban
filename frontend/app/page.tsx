@@ -14,6 +14,7 @@ import {
 import { CountdownCard } from "@/components/CountdownCard";
 import { HealthBadge } from "@/components/HealthBadge";
 import { RationTable } from "@/components/RationTable";
+import { TechnoEconomicWidget } from "@/components/TechnoEconomicWidget";
 import { CattleSelectorBar } from "@/components/ui/CattleSelectorBar";
 import { SectionCard } from "@/components/ui/SectionCard";
 import { StatMetricCard } from "@/components/ui/StatMetricCard";
@@ -109,6 +110,13 @@ export default function DashboardPage() {
           badgeText={healthStatus.riskLevel}
         />
       </div>
+
+      {/* Techno-Economic & Farmer Margin Impact Visualizer */}
+      <TechnoEconomicWidget
+        profile={profile}
+        daysToQurban={daysToQurban}
+        optimizationResult={optimizationResult}
+      />
 
       {/* Main Analytics Grid: Growth Trajectory & Early Health Screening */}
       <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-12">

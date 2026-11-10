@@ -206,6 +206,8 @@ export async function screenCattleHealth(
       riskBadgeColor: dto.risk_badge_color,
       summary: dto.summary,
       recommendedAction: dto.recommended_action,
+      actionSteps: localEval.actionSteps,
+      dietaryIntervention: localEval.dietaryIntervention,
       checkedAt: new Date().toISOString(),
       triggeredIndicators: localEval.triggeredIndicators,
       source: "backend",

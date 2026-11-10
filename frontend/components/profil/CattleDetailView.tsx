@@ -186,6 +186,8 @@ export function CattleDetailView({
       >
         <WeightLogManager
           logs={cattle.weightLogs}
+          profile={cattle}
+          optimizationResult={optimizationResult}
           onAddLog={onAddWeightLog}
           onRemoveLog={onRemoveWeightLog}
         />

@@ -1,11 +1,14 @@
 import React from "react";
+import Link from "next/link";
 import {
   AlertTriangle,
+  ArrowRight,
   CheckCircle2,
   ListChecks,
   MessageCircle,
   Phone,
   ShieldAlert,
+  Sparkles,
 } from "lucide-react";
 import { DEFAULT_VET_CONTACTS } from "@/lib/constants";
 import { formatDateTimeId } from "@/lib/formatters";
@@ -236,6 +239,90 @@ export function HealthBadge({
             </div>
           )}
         </div>
+
+        {/* Rekomendasi Intervensi Ransum AI (Closed-Loop Feeding) */}
+        {status.dietaryIntervention && (
+          <div className="rounded-2xl border border-emerald-300 bg-gradient-to-br from-emerald-50/90 via-teal-50/50 to-white p-3.5 sm:p-4 text-xs shadow-2xs">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-200/80 pb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-700 text-white text-[11px] font-black shadow-2xs">
+                  AI
+                </span>
+                <div>
+                  <h4 className="font-extrabold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
+                    <span>💡 {status.dietaryIntervention.headline}</span>
+                  </h4>
+                  <p className="text-[11px] text-emerald-800 font-medium mt-0.5">
+                    {status.dietaryIntervention.clinicalReason}
+                  </p>
+                </div>
+              </div>
+
+              <Link
+                href="/ransum"
+                className="inline-flex items-center gap-1 rounded-xl bg-emerald-700 px-3 py-1.5 text-xs font-bold text-white shadow-2xs transition-colors hover:bg-emerald-800"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Sesuaikan di Ransum</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+
+            {/* Rekomendasi Porsi Bahan */}
+            <div className="mt-2.5 space-y-2">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                Tindakan Penyesuaian Pakan Hari Ini:
+              </p>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {status.dietaryIntervention.feedAdjustments.map((adj, i) => {
+                  const isPositive =
+                    adj.adjustmentType === "TAMBAH" ||
+                    adj.adjustmentType === "UTAMAKAN";
+                  return (
+                    <div
+                      key={i}
+                      className="flex items-start gap-2 rounded-xl border border-emerald-100 bg-white/95 p-2.5 shadow-2xs"
+                    >
+                      <span
+                        className={`mt-0.5 inline-block shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-black uppercase ${
+                          isPositive
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-amber-100 text-amber-800"
+                        }`}
+                      >
+                        {adj.adjustmentType === "TAMBAH" && adj.suggestedDeltaKg
+                          ? `+${adj.suggestedDeltaKg} kg`
+                          : adj.adjustmentType === "KURANGI" && adj.suggestedDeltaKg
+                          ? `${adj.suggestedDeltaKg} kg`
+                          : adj.adjustmentType.replace("_", " ")}
+                      </span>
+                      <div className="min-w-0">
+                        <strong className="text-xs text-slate-900 font-bold block truncate">
+                          {adj.feedName}
+                        </strong>
+                        <p className="text-[11px] text-slate-600 leading-snug mt-0.5">
+                          {adj.note}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Tips Praktis Peternak */}
+            {status.dietaryIntervention.practicalTips.length > 0 && (
+              <div className="mt-2.5 border-t border-emerald-100/90 pt-2 text-[11px] text-slate-600">
+                <span className="font-bold text-slate-700">Tips Operasional Kandang:</span>
+                <ul className="mt-1 list-disc pl-4 space-y-0.5">
+                  {status.dietaryIntervention.practicalTips.map((tip, idx) => (
+                    <li key={idx} className="leading-relaxed">{tip}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Edukasi Penanganan Mandiri saat Status Waspada (Kuning) */}
         {status.riskLevel === "KUNING" && (

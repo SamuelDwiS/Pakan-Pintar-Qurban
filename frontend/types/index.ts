@@ -133,6 +133,26 @@ export interface HealthChecklistForm {
   catatanTambahan?: string;
 }
 
+export interface FeedAdjustmentItem {
+  feedName: string; // contoh: Bran Polar, Nutrifeed, Ampas Tahu, Dami (Jerami Padi)
+  adjustmentType: "TAMBAH" | "KURANGI" | "HINDARI_SEMENTARA" | "UTAMAKAN";
+  suggestedDeltaKg?: number; // contoh: +0.5 kg
+  note: string; // penjelasan operasional
+}
+
+export interface DietaryInterventionRecommendation {
+  headline: string;
+  clinicalReason: string;
+  feedAdjustments: FeedAdjustmentItem[];
+  practicalTips: string[];
+  suggestedRationOverride?: {
+    minPolarKg?: number;
+    maxDamiKg?: number;
+    maxAmpasTahuKg?: number;
+    boostNutrifeedKg?: number;
+  };
+}
+
 export interface HealthStatus {
   cattleId: string;
   totalScore: number;
@@ -141,6 +161,7 @@ export interface HealthStatus {
   summary: string;
   recommendedAction: string;
   actionSteps?: string[];
+  dietaryIntervention?: DietaryInterventionRecommendation;
   checkedAt: string; // ISO timestamp
   triggeredIndicators?: string[];
   catatanTambahan?: string;

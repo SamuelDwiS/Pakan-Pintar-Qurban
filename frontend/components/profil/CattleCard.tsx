@@ -59,6 +59,13 @@ export function CattleCard({
   );
   const maxBioAdg = optimization?.maxBiologicalAdgKg ?? 1.5;
 
+  const sortedLogs = [...cattle.weightLogs].sort((a, b) => a.date.localeCompare(b.date));
+  const latestLog = sortedLogs[sortedLogs.length - 1];
+  const prevLog = sortedLogs.length >= 2 ? sortedLogs[sortedLogs.length - 2] : null;
+  const recentWeightDiff = prevLog && latestLog ? Number((latestLog.weightKg - prevLog.weightKg).toFixed(1)) : 0;
+  const hasWeightDrop = recentWeightDiff < 0;
+  const isBioAdgExceeded = requiredAdg > maxBioAdg;
+
   return (
     <div
       className={`flex flex-col justify-between rounded-2xl border bg-white p-3.5 sm:p-5 transition-all hover:shadow-md ${
@@ -78,6 +85,16 @@ export function CattleCard({
               </span>
             )}
             <HealthBadge status={healthStatus} variant="compact" />
+            {hasWeightDrop && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-700 ring-1 ring-inset ring-rose-200" title="Terdeteksi anomali penurunan bobot timbangan terakhir">
+                ⚠️ Turun {Math.abs(recentWeightDiff)} kg
+              </span>
+            )}
+            {isBioAdgExceeded && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-800 ring-1 ring-inset ring-amber-200" title={`PBBH ${requiredAdg} kg/hr melebihi batas biologis ras ${cattle.breed}`}>
+                ⚠️ PBBH &gt; Biologis
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-1">

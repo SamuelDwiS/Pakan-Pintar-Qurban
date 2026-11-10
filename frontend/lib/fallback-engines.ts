@@ -1,5 +1,7 @@
 import type {
   CattleProfile,
+  DietaryInterventionRecommendation,
+  FeedAdjustmentItem,
   FeedItem,
   GrowthTrajectoryPoint,
   HealthChecklistForm,
@@ -522,6 +524,148 @@ export function buildGrowthTrajectory(profile: CattleProfile): {
 /**
  * Fallback Engine Modul 3: Sistem Pakar Skrining Dini PMK (KIAT VETINDO PMK Kementan RI)
  */
+/**
+ * Mesin Intervensi Pakan Pintar AI (Closed-Loop Nutrition & Health Feedback)
+ * Menyesuaikan formula pakan lokal berdasarkan kondisi klinis yang terdeteksi
+ */
+export function generateDietaryIntervention(
+  input: HealthChecklistForm,
+  riskLevel: "HIJAU" | "KUNING" | "MERAH"
+): DietaryInterventionRecommendation | undefined {
+  // 1. Kasus Sariawan / Lepuh Mulut atau Air Liur Menggantung Kritis
+  if (input.lepuhMulutKaki || (input.airLiurBerlebih && riskLevel === "MERAH")) {
+    return {
+      headline: "Proteksi Rongga Mulut & Komboran Lunak",
+      clinicalReason:
+        "Rongga mulut dan lidah sapi mengalami lesi/sariawan nyeri. Serat kasar yang tajam akan melukai gusi.",
+      feedAdjustments: [
+        {
+          feedName: "Dami (Jerami Padi)",
+          adjustmentType: "HINDARI_SEMENTARA",
+          note: "Hentikan sementara jerami kering berujung kaku agar tidak menusuk luka lepuh mulut.",
+        },
+        {
+          feedName: "Katul",
+          adjustmentType: "UTAMAKAN",
+          suggestedDeltaKg: 0.5,
+          note: "Gunakan dedak/katul halus yang diseduh air hangat menjadi bubur komboran lembut.",
+        },
+        {
+          feedName: "Ampas Tahu",
+          adjustmentType: "UTAMAKAN",
+          suggestedDeltaKg: 1.0,
+          note: "Ampas tahu bertekstur empuk basah, tinggi protein, dan mudah ditelan tanpa perlu dikunyah keras.",
+        },
+      ],
+      practicalTips: [
+        "Sajikan pakan dalam bentuk komboran bubur suam-suam kuku langsung di depan moncong sapi.",
+        "Bilas moncong sapi dengan air garam hangat atau rebusan daun sirih secara lembut.",
+        "Potong rumput segar menjadi cacahan sangat pendek (< 3 cm) agar mudah dikunyah.",
+      ],
+      suggestedRationOverride: {
+        maxDamiKg: 0,
+        maxAmpasTahuKg: 6,
+      },
+    };
+  }
+
+  // 2. Kasus Diare / Kotoran Cair
+  if (input.diare) {
+    return {
+      headline: "Stabilisasi Rumen & Pemadatan Feses",
+      clinicalReason:
+        "Kotoran encer menandakan gangguan pencernaan atau kelebihan asam/kadar air tinggi pada mikrobiota rumen.",
+      feedAdjustments: [
+        {
+          feedName: "Ampas Tahu",
+          adjustmentType: "KURANGI",
+          suggestedDeltaKg: -1.5,
+          note: "Kurangi pakan basah berkadar air tinggi yang cepat terfermentasi menjadi asam.",
+        },
+        {
+          feedName: "Dami (Jerami Padi)",
+          adjustmentType: "TAMBAH",
+          suggestedDeltaKg: 1.0,
+          note: "Perbanyak jerami kering bersih untuk merangsang pengunyahan kembali (ruminasi) dan memadatkan feses.",
+        },
+        {
+          feedName: "Katul",
+          adjustmentType: "UTAMAKAN",
+          note: "Pertahankan dedak/katul kering sebagai bahan pengikat cairan di saluran cerna.",
+        },
+      ],
+      practicalTips: [
+        "Berikan air minum bersih dicampur 1 sendok garam dapur dan sedikit gula merah untuk mencegah dehidrasi.",
+        "Jangan berikan rumput basah yang baru dipotong saat hujan.",
+      ],
+      suggestedRationOverride: {
+        maxAmpasTahuKg: 2,
+      },
+    };
+  }
+
+  // 3. Kasus Penurunan Nafsu Makan (> 10%)
+  if (input.penurunanPakanPercent > 10 || input.airLiurBerlebih) {
+    return {
+      headline: "Intervensi Palatabilitas & Perangsang Nafsu Makan",
+      clinicalReason: `Nafsu makan terpantau turun ${input.penurunanPakanPercent}%. Sapi membutuhkan pakan beraroma wangi yang menggugah selera.`,
+      feedAdjustments: [
+        {
+          feedName: "Bran Polar",
+          adjustmentType: "TAMBAH",
+          suggestedDeltaKg: 0.5,
+          note: "Tambahkan porsi polar karena aroma manis gandumnya sangat disukai sapi (palatabilitas tinggi).",
+        },
+        {
+          feedName: "Dami (Jerami Padi)",
+          adjustmentType: "KURANGI",
+          suggestedDeltaKg: -1.0,
+          note: "Kurangi dami hambar yang membuat sapi semakin malas mengunyah saat kondisi lesu.",
+        },
+      ],
+      practicalTips: [
+        "Percikkan air larutan garam dapur hangat atau sedikit tetes tebu (molases) di atas tumpukan pakan.",
+        "Bagi jadwal pemberian pakan menjadi porsi kecil tetapi lebih sering (3x sehari: pagi, siang, sore).",
+        "Bersihkan palungan dari sisa pakan masam sebelum menuangkan adukan baru.",
+      ],
+      suggestedRationOverride: {
+        minPolarKg: 1.0,
+      },
+    };
+  }
+
+  // 4. Kasus Bobot Badan Turun (> 2% per minggu)
+  if (input.penurunanBobotPercent > 2) {
+    return {
+      headline: "Peningkatan Densitas Energi & Kompensasi Bobot Kurban",
+      clinicalReason: `Terjadi penyusutan bobot nyata ${input.penurunanBobotPercent}%. Dibutuhkan densitas kalori lebih padat untuk mengejar target kurban.`,
+      feedAdjustments: [
+        {
+          feedName: "Nutrifeed (Konsentrat)",
+          adjustmentType: "TAMBAH",
+          suggestedDeltaKg: 0.5,
+          note: "Tingkatkan konsentrat energi TDN tinggi untuk memacu percepatan laju PBBH harian.",
+        },
+        {
+          feedName: "Ampas Tahu",
+          adjustmentType: "TAMBAH",
+          suggestedDeltaKg: 1.0,
+          note: "Dongkrak asupan protein kasar (PK) mudah serap untuk pembentukan massa otot/daging.",
+        },
+      ],
+      practicalTips: [
+        "Berikan konsentrat padat sebelum hijauan agar energi terserap maksimal oleh rumen.",
+        "Lakukan penimbangan ulang dalam 7 hari ke depan untuk mengevaluasi kurva pertumbuhan kompensasi.",
+      ],
+      suggestedRationOverride: {
+        boostNutrifeedKg: 0.5,
+      },
+    };
+  }
+
+  return undefined;
+}
+
 export function evaluateHealthFallback(
   input: HealthChecklistForm
 ): HealthStatus {
@@ -561,7 +705,10 @@ export function evaluateHealthFallback(
     );
   }
 
-  if (score >= 40) {
+  const riskLevel = score >= 40 ? "MERAH" : score >= 20 ? "KUNING" : "HIJAU";
+  const dietaryIntervention = generateDietaryIntervention(input, riskLevel);
+
+  if (riskLevel === "MERAH") {
     return {
       cattleId: input.cattleId,
       totalScore: score,
@@ -578,6 +725,7 @@ export function evaluateHealthFallback(
         "Cuci luka lepuh di mulut & sela kuku dengan air hangat bersih untuk meredakan nyeri.",
         "Segera hubungi mantri hewan langganan Anda untuk pemeriksaan medis dan suntikan obat/vitamin.",
       ],
+      dietaryIntervention,
       checkedAt: new Date().toISOString(),
       triggeredIndicators: triggered,
       catatanTambahan: input.catatanTambahan,
@@ -585,7 +733,7 @@ export function evaluateHealthFallback(
     };
   }
 
-  if (score >= 20) {
+  if (riskLevel === "KUNING") {
     return {
       cattleId: input.cattleId,
       totalScore: score,
@@ -601,6 +749,7 @@ export function evaluateHealthFallback(
         "Berikan rumput segar yang agak layu; kurangi porsi ampas tahu basah atau konsentrat jika ada diare.",
         "Amati suhu tubuh & nafsu makan selama 1x24 jam. Jika besok belum pulih, panggil mantri hewan langganan Anda.",
       ],
+      dietaryIntervention,
       checkedAt: new Date().toISOString(),
       triggeredIndicators: triggered,
       catatanTambahan: input.catatanTambahan,
@@ -622,6 +771,7 @@ export function evaluateHealthFallback(
       "Bersihkan sisa pakan yang mulai masam di palungan setiap pagi.",
       "Lakukan penimbangan berkala 1–2 minggu sekali untuk memantau target kurban.",
     ],
+    dietaryIntervention,
     checkedAt: new Date().toISOString(),
     triggeredIndicators: triggered,
     catatanTambahan: input.catatanTambahan,
