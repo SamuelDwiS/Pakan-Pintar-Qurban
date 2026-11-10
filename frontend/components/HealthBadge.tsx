@@ -367,7 +367,7 @@ export function HealthBadge({
             >
               {activeContacts.map((contact) => {
                 const cleanPhone =
-                  contact.phone.replace(/[^0-9]/g, "") || "6281390375757";
+                  contact.phone.replace(/[^0-9]/g, "") || "6281200000001";
                 const waText = [
                   `*LAPORAN DARURAT KESEHATAN TERNAK — PAKAN PINTAR QURBAN*`,
                   `Yth. ${contact.name}`,

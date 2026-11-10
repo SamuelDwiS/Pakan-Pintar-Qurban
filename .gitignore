@@ -4,14 +4,20 @@ nginx/
 
 # Python
 __pycache__/
+*/__pycache__/
+**/*__pycache__*
 *.py[cod]
 *$py.class
 *.so
 .Python
 .venv/
+*/.venv/
+**/.venv*
 venv/
 ENV/
 env/
+backend/.venv/
+backend/__pycache__/
 *.egg-info/
 dist/
 build/

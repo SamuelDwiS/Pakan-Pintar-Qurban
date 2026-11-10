@@ -29,21 +29,21 @@ export const DEFAULT_VET_CONTACTS: VetContactItem[] = [
   {
     id: "vet-1",
     name: "Pak Mantri Budi",
-    phone: "6281390375757",
+    phone: "6281200000001",
     roleNote: "Mantri Langganan Utama (Desa)",
     isPrimary: true,
   },
   {
     id: "vet-2",
     name: "drh. Hendra Wijaya",
-    phone: "6281234567890",
+    phone: "6281200000002",
     roleNote: "Puskeswan / Medik Veteriner Kecamatan",
     isPrimary: false,
   },
   {
     id: "vet-3",
     name: "Pak Mantri Yanto",
-    phone: "6285678901234",
+    phone: "6281200000003",
     roleNote: "Mantri Cadangan (Suntik / IB)",
     isPrimary: false,
   },
@@ -51,7 +51,7 @@ export const DEFAULT_VET_CONTACTS: VetContactItem[] = [
 
 export const DEFAULT_FARM_SETTINGS: FarmSettings = {
   defaultTargetDateQurban: "2027-05-17", // Estimasi Idul Adha 1448 H
-  vetWhatsappNumber: "6281390375757",
+  vetWhatsappNumber: "6281200000001",
   vetClinicName: "Puskeswan / Medik Veteriner Terdekat",
   vetContacts: DEFAULT_VET_CONTACTS,
 };

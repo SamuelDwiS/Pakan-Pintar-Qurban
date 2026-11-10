@@ -129,7 +129,7 @@ export default function MasterKandangPage() {
     updateFarmSettings({
       defaultTargetDateQurban: qurbanDate,
       vetClinicName: primary?.name.trim() || "Mantri Hewan Terdekat",
-      vetWhatsappNumber: (primary?.phone || "6281390375757").replace(/[^0-9]/g, ""),
+      vetWhatsappNumber: (primary?.phone || "6281200000001").replace(/[^0-9]/g, ""),
       vetContacts: contacts,
     });
     setSettingsSaved(true);
