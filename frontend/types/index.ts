@@ -221,3 +221,33 @@ export interface ApiHealthScreeningResponseDTO {
   recommendedAction?: string;
   recommended_action: string;
 }
+
+// ============================================================================
+// AI API Recommendation Types (DeepSeek / Deploy.com / LLM Advisor)
+// ============================================================================
+
+export interface AiIngredientMixItem {
+  name: string;
+  amountKg: number;
+  morningKg: number;
+  afternoonKg: number;
+  costRp: number;
+  nutritionalRole: string;
+}
+
+export interface AiRationRecommendation {
+  source: "deploy_deepseek" | "groq_deepseek" | "gemini" | "fallback_expert_system";
+  modelUsed?: string;
+  status: "success" | "error";
+  analysis: {
+    pbbhEvaluation: string;
+    feedStrategy: string;
+    adaptationNote: string;
+  };
+  recommendedMix: AiIngredientMixItem[];
+  totalDailyCostRp: number;
+  totalPeriodCostRp: number;
+  managementAdvice: string[];
+  warnings: string[];
+  generatedAt: string;
+}

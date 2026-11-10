@@ -14,6 +14,7 @@ import {
   Warehouse,
   Wheat,
 } from "lucide-react";
+import { AiRecommendationCard } from "@/components/ransum/AiRecommendationCard";
 import { FeedItemCard } from "@/components/ransum/FeedItemCard";
 import { RationTable } from "@/components/RationTable";
 import { CattleSelectorBar } from "@/components/ui/CattleSelectorBar";
@@ -277,6 +278,14 @@ export default function RansumPage() {
               daysToQurban={daysToQurban}
             />
           </SectionCard>
+
+          {/* AI Recommendation Engine (DeepSeek / LLM Advisor) */}
+          <AiRecommendationCard
+            profile={profile}
+            feeds={feeds}
+            daysToQurban={daysToQurban}
+            optimizationResult={optimizationResult}
+          />
         </>
       ) : (
         /* =================================================================== */

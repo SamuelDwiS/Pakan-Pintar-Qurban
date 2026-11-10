@@ -217,7 +217,7 @@ function ProfilPageContent() {
             className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-700 px-3.5 py-2 text-xs font-bold text-white shadow-xs transition-colors hover:bg-emerald-800"
           >
             <Plus className="h-4 w-4 stroke-[2.5]" />
-            <span>+ Tambah Sapi Baru</span>
+            <span>Tambah Sapi Baru</span>
           </button>
         </div>
       </div>
