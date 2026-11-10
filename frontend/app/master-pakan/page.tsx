@@ -2,12 +2,14 @@
 
 import React, { useMemo, useState } from "react";
 import {
+  Coins,
   Dna,
   Pencil,
   Plus,
   RotateCcw,
   Sparkles,
   Trash2,
+  Warehouse,
   Wheat,
 } from "lucide-react";
 import { BreedCrudModal } from "@/components/master/BreedCrudModal";
@@ -16,7 +18,7 @@ import { CustomFeedModal } from "@/components/ransum/CustomFeedModal";
 import { FeedItemCard } from "@/components/ransum/FeedItemCard";
 import { SectionCard } from "@/components/ui/SectionCard";
 import { useAppState } from "@/context/AppStateContext";
-import { formatRupiah } from "@/lib/formatters";
+import { formatKg, formatRupiah } from "@/lib/formatters";
 import type { BreedItem } from "@/types";
 
 export default function MasterPakanPage() {
@@ -72,6 +74,19 @@ export default function MasterPakanPage() {
     );
 
     return { bestPk, bestPkCost, bestTdn, bestTdnCost };
+  }, [feeds]);
+
+  // Perhitungan Akumulasi Total Stok Keseluruhan Pakan di Gudang
+  const totalStockKg = useMemo(() => {
+    return feeds
+      .filter((f) => f.isActive)
+      .reduce((acc, f) => acc + (f.maxLimitKg || 0), 0);
+  }, [feeds]);
+
+  const totalStockValueRp = useMemo(() => {
+    return feeds
+      .filter((f) => f.isActive)
+      .reduce((acc, f) => acc + (f.maxLimitKg || 0) * f.pricePerKg, 0);
   }, [feeds]);
 
   const handleOpenAddBreed = () => {
@@ -188,8 +203,8 @@ export default function MasterPakanPage() {
 
           {/* Daftar Katalog Bahan Pakan */}
           <SectionCard
-            title="Master Harga & Kandungan Nutrisi Bahan Pakan Lokal"
-            subtitle="Perbarui harga pasar lokal di daerah Anda atau tambahkan limbah pertanian sekitar kandang"
+            title="Master Katalog & Total Stok Pakan Tersedia"
+            subtitle="Kelola harga pasar lokal, kandungan nutrisi, dan total stok keseluruhan pakan (kg) yang tersedia di gudang/kandang"
             icon={<Wheat className="h-5 w-5" />}
             action={
               <div className="flex flex-wrap items-center gap-2">
@@ -212,12 +227,53 @@ export default function MasterPakanPage() {
               </div>
             }
           >
+            {/* Ringkasan Akumulasi Total Stok Keseluruhan Pakan di Gudang */}
+            <div className="mb-4 grid grid-cols-1 gap-3 rounded-2xl border border-slate-200/90 bg-slate-50/80 p-3.5 sm:grid-cols-2 sm:p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-2xs">
+                  <Warehouse className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    Total Stok Keseluruhan Pakan di Gudang
+                  </p>
+                  <p className="text-base sm:text-lg font-black text-slate-900">
+                    {formatKg(totalStockKg, 1)}
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    Total akumulasi berat fisik pakan aktif yang siap diransumkan
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-600 text-white shadow-2xs">
+                  <Coins className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    Estimasi Total Nilai Aset Pakan
+                  </p>
+                  <p className="text-base sm:text-lg font-black text-emerald-800">
+                    {formatRupiah(totalStockValueRp)}
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    Valuasi total inventaris pakan berdasarkan harga pasar
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
               {feeds.map((feed) => (
                 <FeedItemCard
                   key={feed.id}
                   feed={feed}
                   showEfficiency
+                  stockLabel="Total Stok Pakan (kg)"
+                  stockTooltip="Total stok keseluruhan pakan yang tersedia di gudang/kandang dalam satuan berat kg"
+                  stockUnit="kg"
+                  maxStockLimit={100000}
                   onToggleActive={(id, isActive) =>
                     updateFeedItem(id, { isActive })
                   }

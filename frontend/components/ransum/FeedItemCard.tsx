@@ -8,10 +8,101 @@ import type { FeedItem } from "@/types";
 interface FeedItemCardProps {
   feed: FeedItem;
   showEfficiency?: boolean;
+  stockLabel?: string;
+  stockTooltip?: string;
+  stockUnit?: string;
+  maxStockLimit?: number;
   onToggleActive: (id: string, isActive: boolean) => void;
   onChangePrice: (id: string, pricePerKg: number) => void;
   onChangeMaxLimit: (id: string, maxLimitKg: number) => void;
   onDeleteCustom?: (id: string) => void;
+}
+
+function FeedNumberInput({
+  value,
+  onChange,
+  min = 0,
+  max,
+  step = 1,
+  disabled = false,
+  className,
+  placeholder = "0",
+}: {
+  value: number;
+  onChange: (val: number) => void;
+  min?: number;
+  max?: number;
+  step?: number | string;
+  disabled?: boolean;
+  className?: string;
+  placeholder?: string;
+}) {
+  const [localVal, setLocalVal] = React.useState<string>(
+    value === 0 ? "0" : String(value)
+  );
+
+  React.useEffect(() => {
+    const parsed = parseFloat(localVal);
+    if ((isNaN(parsed) && value !== 0) || (!isNaN(parsed) && parsed !== value)) {
+      setLocalVal(value === 0 ? "0" : String(value));
+    }
+  }, [value]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let raw = e.target.value;
+
+    // Hapus angka 0 di depan jika diikuti angka lain (misal: "05" -> "5", "0100" -> "100")
+    if (/^0[0-9]/.test(raw)) {
+      raw = raw.replace(/^0+/, "");
+      if (raw === "") raw = "0";
+    }
+
+    setLocalVal(raw);
+
+    if (raw === "" || raw === "-") {
+      onChange(0);
+      return;
+    }
+
+    const num = parseFloat(raw);
+    if (!isNaN(num)) {
+      let finalNum = num;
+      if (min !== undefined && finalNum < min) finalNum = min;
+      if (max !== undefined && finalNum > max) finalNum = max;
+      onChange(finalNum);
+    }
+  };
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    // Otomatis select all agar saat nilai 0 langsung tergantikan dengan ketikan baru
+    e.target.select();
+  };
+
+  const handleBlur = () => {
+    if (localVal === "" || isNaN(parseFloat(localVal))) {
+      setLocalVal("0");
+      onChange(0);
+    } else {
+      const num = parseFloat(localVal);
+      setLocalVal(String(num));
+    }
+  };
+
+  return (
+    <input
+      type="number"
+      min={min}
+      max={max}
+      step={step}
+      disabled={disabled}
+      value={localVal}
+      onChange={handleChange}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      placeholder={placeholder}
+      className={className}
+    />
+  );
 }
 
 const CATEGORY_BADGES: Record<
@@ -35,6 +126,10 @@ const CATEGORY_BADGES: Record<
 export function FeedItemCard({
   feed,
   showEfficiency = false,
+  stockLabel = "Stok Tersedia (kg/hari)",
+  stockTooltip = "Jumlah stok pakan maksimal yang dimiliki peternak untuk sapi ini per hari",
+  stockUnit = "kg",
+  maxStockLimit = 100000,
   onToggleActive,
   onChangePrice,
   onChangeMaxLimit,
@@ -145,42 +240,36 @@ export function FeedItemCard({
             <span className="pointer-events-none absolute inset-y-0 left-2.5 flex items-center text-xs font-semibold text-slate-400">
               Rp
             </span>
-            <input
-              type="number"
+            <FeedNumberInput
               min={0}
               step={50}
               disabled={!feed.isActive}
               value={feed.pricePerKg}
-              onChange={(e) =>
-                onChangePrice(feed.id, Math.max(0, Number(e.target.value)))
-              }
+              onChange={(val) => onChangePrice(feed.id, val)}
               className="w-full rounded-xl border border-slate-300 bg-white py-1.5 pl-8 pr-2.5 text-xs font-bold text-slate-900 focus:border-emerald-600 focus:outline-none disabled:bg-slate-100"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-[11px] font-semibold text-slate-600">
-            Batas Maks (kg/hari)
+          <label
+            className="block text-[11px] font-semibold text-slate-600 truncate"
+            title={stockTooltip}
+          >
+            {stockLabel}
           </label>
           <div className="relative mt-1">
-            <input
-              type="number"
-              min={0.5}
-              max={100}
+            <FeedNumberInput
+              min={0}
+              max={maxStockLimit}
               step={0.5}
               disabled={!feed.isActive}
               value={feed.maxLimitKg}
-              onChange={(e) =>
-                onChangeMaxLimit(
-                  feed.id,
-                  Math.max(0.5, Number(e.target.value))
-                )
-              }
+              onChange={(val) => onChangeMaxLimit(feed.id, val)}
               className="w-full rounded-xl border border-slate-300 bg-white py-1.5 pl-2.5 pr-8 text-xs font-bold text-slate-900 focus:border-emerald-600 focus:outline-none disabled:bg-slate-100"
             />
             <span className="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-[11px] font-medium text-slate-400">
-              kg
+              {stockUnit}
             </span>
           </div>
         </div>

@@ -127,6 +127,7 @@ export function CustomFeedModal({
                 type="number"
                 step="0.1"
                 {...register("bkPercent", { required: true, min: 5, max: 100 })}
+                onFocus={(e) => e.target.select()}
                 className="mt-1 w-full rounded-xl border border-slate-300 px-2.5 py-2 text-sm text-slate-900"
               />
             </div>
@@ -138,6 +139,7 @@ export function CustomFeedModal({
                 type="number"
                 step="0.1"
                 {...register("pkPercent", { required: true, min: 1, max: 60 })}
+                onFocus={(e) => e.target.select()}
                 className="mt-1 w-full rounded-xl border border-slate-300 px-2.5 py-2 text-sm text-slate-900"
               />
             </div>
@@ -153,6 +155,7 @@ export function CustomFeedModal({
                   min: 20,
                   max: 95,
                 })}
+                onFocus={(e) => e.target.select()}
                 className="mt-1 w-full rounded-xl border border-slate-300 px-2.5 py-2 text-sm text-slate-900"
               />
             </div>
@@ -167,17 +170,19 @@ export function CustomFeedModal({
                 type="number"
                 step="50"
                 {...register("pricePerKg", { required: true, min: 0 })}
+                onFocus={(e) => e.target.select()}
                 className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700">
-                Batas Maks (kg/hari)
+                Stok Tersedia (kg/hari)
               </label>
               <input
                 type="number"
                 step="0.5"
-                {...register("maxLimitKg", { required: true, min: 0.5 })}
+                {...register("maxLimitKg", { required: true, min: 0 })}
+                onFocus={(e) => e.target.select()}
                 className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900"
               />
             </div>
