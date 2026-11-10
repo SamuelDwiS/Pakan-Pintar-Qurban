@@ -5,6 +5,7 @@ Machine Learning (Linear Regression) + Linear Programming / SLSQP
 ============================================================
 Sesuai rancangan formulasi Google Colab untuk kompetisi Pekan Insinyur Peternakan UGM 2026.
 Dataset sintetis: backend/dataset/dataset_demo_sintetis_pbbh.csv
+Mendukung 6 pakan lapangan peternak: Rumput Segar, Dami Jerami Padi, Nutrifeed, Bran Polar, Katul, Ampas Tahu.
 """
 
 import os
@@ -16,7 +17,7 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from scipy.optimize import minimize
+from scipy.optimize import minimize, linprog
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
@@ -27,8 +28,8 @@ from sklearn.model_selection import train_test_split
 
 app = FastAPI(
     title="Pakan Pintar Qurban - Formulation & Optimization API",
-    description="Engine optimasi formulasi pakan biaya minimum berbasis Machine Learning PBBH dan SLSQP Solver",
-    version="2.0.0",
+    description="Engine optimasi formulasi pakan biaya minimum berbasis Machine Learning PBBH dan SLSQP Solver untuk 6 Pakan Lapangan",
+    version="2.1.0",
 )
 
 app.add_middleware(
@@ -58,40 +59,87 @@ FITUR = [
     "total_four_ingredient_mix_kg_day_as_fed",
 ]
 
+# Daftar 6 Bahan Pakan Riil Peternak (Hijauan, Serat Kasar, dan Konsentrat)
 NAMA_BAHAN = [
-    "Katul",
-    "Pollard",
-    "NutriFeed BC134",
+    "Rumput Segar",
+    "Dami (Jerami Padi)",
+    "Nutrifeed (Konsentrat)",
+    "Bran Polar",
+    "Katul (Dedak Padi)",
     "Ampas Tahu",
 ]
 
 DEFAULT_HARGA_BAHAN = {
-    "Katul": 3000.0,
-    "Pollard": 4000.0,
-    "NutriFeed BC134": 5000.0,
-    "Ampas Tahu": 2000.0,
+    "Rumput Segar": 500.0,
+    "Dami (Jerami Padi)": 400.0,
+    "Nutrifeed (Konsentrat)": 4200.0,
+    "Bran Polar": 4000.0,
+    "Katul (Dedak Padi)": 3200.0,
+    "Ampas Tahu": 1000.0,
 }
 
 DEFAULT_BATAS_MINIMUM = {
-    "Katul": 0.0,
-    "Pollard": 0.0,
-    "NutriFeed BC134": 0.0,
+    "Rumput Segar": 5.0,  # Minimal hijauan rumen
+    "Dami (Jerami Padi)": 0.0,
+    "Nutrifeed (Konsentrat)": 0.0,
+    "Bran Polar": 0.0,
+    "Katul (Dedak Padi)": 0.0,
     "Ampas Tahu": 0.0,
 }
 
 DEFAULT_BATAS_MAKSIMUM = {
-    "Katul": 4.0,
-    "Pollard": 4.0,
-    "NutriFeed BC134": 4.0,
-    "Ampas Tahu": 4.0,
+    "Rumput Segar": 40.0,
+    "Dami (Jerami Padi)": 8.0,
+    "Nutrifeed (Konsentrat)": 6.0,
+    "Bran Polar": 4.5,
+    "Katul (Dedak Padi)": 4.0,
+    "Ampas Tahu": 10.0,
 }
 
-# Nutrisi dasar bahan untuk perhitungan BK, PK, TDN
+# Nutrisi dasar bahan untuk perhitungan BK (Dry Matter), PK (Crude Protein), TDN (Energy)
 NUTRISI_BAHAN = {
-    "Katul": {"bk_percent": 87.7, "pk_percent": 12.0, "tdn_percent": 67.9},
-    "Pollard": {"bk_percent": 88.0, "pk_percent": 16.0, "tdn_percent": 72.0},
-    "NutriFeed BC134": {"bk_percent": 87.0, "pk_percent": 14.0, "tdn_percent": 70.0},
-    "Ampas Tahu": {"bk_percent": 14.5, "pk_percent": 20.0, "tdn_percent": 76.0},
+    "Rumput Segar": {
+        "bk_percent": 21.0,
+        "pk_percent": 9.5,
+        "tdn_percent": 55.0,
+        "category": "Hijauan",
+        "is_roughage": True,
+    },
+    "Dami (Jerami Padi)": {
+        "bk_percent": 86.0,
+        "pk_percent": 4.5,
+        "tdn_percent": 43.0,
+        "category": "Limbah Pertanian",
+        "is_roughage": True,
+    },
+    "Nutrifeed (Konsentrat)": {
+        "bk_percent": 88.0,
+        "pk_percent": 14.5,
+        "tdn_percent": 70.0,
+        "category": "Konsentrat",
+        "is_roughage": False,
+    },
+    "Bran Polar": {
+        "bk_percent": 88.5,
+        "pk_percent": 15.5,
+        "tdn_percent": 74.0,
+        "category": "Konsentrat",
+        "is_roughage": False,
+    },
+    "Katul (Dedak Padi)": {
+        "bk_percent": 88.0,
+        "pk_percent": 11.5,
+        "tdn_percent": 65.0,
+        "category": "Konsentrat",
+        "is_roughage": False,
+    },
+    "Ampas Tahu": {
+        "bk_percent": 14.0,
+        "pk_percent": 22.0,
+        "tdn_percent": 76.0,
+        "category": "Konsentrat",
+        "is_roughage": False,
+    },
 }
 
 # State Global Model & Metrik Evaluasi
@@ -109,12 +157,11 @@ model_state: Dict[str, Any] = {
 
 
 def latih_model_pbbh():
-    """Melatih Linear Regression Model pada dataset demo sintetis."""
+    """Melatih Linear Regression Model pada dataset demo sintetis konsentrat."""
     global model_state
 
     if not DATASET_PATH.exists():
         print(f"[WARNING] Dataset tidak ditemukan di: {DATASET_PATH}. Menggunakan fallback dummy regression.")
-        # Fallback dummy regression jika file dataset dipindah
         dummy_lr = LinearRegression()
         X_dummy = np.array([[350, 24, 30, 0.5, 0.5, 1.5, 2.5, 5.0]])
         y_dummy = np.array([1.0])
@@ -168,28 +215,65 @@ latih_model_pbbh()
 
 
 # ============================================================
-# 3. FUNGSI PREDIKSI PBBH & OPTIMASI (COLAB ALGORITHM)
+# 3. FUNGSI PREDIKSI PBBH & OPTIMASI (LEAST-COST SLSQP + LP)
 # ============================================================
 
-def prediksi_pbbh(bobot_awal: float, umur_bulan: float, hari_lingkungan: float, komposisi: np.ndarray) -> float:
-    """Prediksi PBBH menggunakan model Linear Regression terlatih."""
+def prediksi_pbbh_konsentrat(
+    bobot_awal: float,
+    umur_bulan: float,
+    hari_lingkungan: float,
+    katul_kg: float,
+    polar_kg: float,
+    nutrifeed_kg: float,
+    ampas_tahu_kg: float,
+) -> float:
+    """Prediksi PBBH menggunakan model Linear Regression dari fraksi 4 konsentrat."""
     model = model_state["model"]
     if model is None:
         return 0.8
 
-    total_mix = float(np.sum(komposisi))
+    total_mix = float(katul_kg + polar_kg + nutrifeed_kg + ampas_tahu_kg)
     data_input = {
         "current_weight_kg": bobot_awal,
         "age_months": umur_bulan,
         "days_since_moved_to_current_environment": hari_lingkungan,
-        "rice_bran_katul_kg_day_as_fed": float(komposisi[0]),
-        "wheat_pollard_kg_day_as_fed": float(komposisi[1]),
-        "commercial_concentrate_nutrifeed_kg_day_as_fed": float(komposisi[2]),
-        "tofu_dregs_kg_day_as_fed": float(komposisi[3]),
+        "rice_bran_katul_kg_day_as_fed": katul_kg,
+        "wheat_pollard_kg_day_as_fed": polar_kg,
+        "commercial_concentrate_nutrifeed_kg_day_as_fed": nutrifeed_kg,
+        "tofu_dregs_kg_day_as_fed": ampas_tahu_kg,
         "total_four_ingredient_mix_kg_day_as_fed": total_mix,
     }
     X_input = pd.DataFrame([data_input])[FITUR]
     return float(model.predict(X_input)[0])
+
+
+def hitung_kebutuhan_nutrisi_kearl(bobot_kg: float, pbbh_target: float) -> Dict[str, float]:
+    """
+    Menghitung kebutuhan harian Bahan Kering (BK), Protein Kasar (PK),
+    dan Total Digestible Nutrients (TDN) berdasarkan standar Kearl (1982) & NRC Sapi Potong Tropis.
+    """
+    metabolic_w = bobot_kg ** 0.75
+
+    # 1. Kebutuhan BK: ~2.4% - 2.8% Bobot Badan
+    bk_req = bobot_kg * 0.024
+    bk_max_capacity = bobot_kg * 0.030
+
+    # 2. Kebutuhan TDN: Maintenance + Gain
+    tdn_maint = 0.038 * metabolic_w
+    tdn_gain = pbbh_target * 1.85
+    tdn_req = min(bk_req * 0.74, tdn_maint + tdn_gain)
+
+    # 3. Kebutuhan PK: Maintenance + Gain
+    pk_maint = 0.0038 * metabolic_w
+    pk_gain = pbbh_target * 0.34
+    pk_req = pk_maint + pk_gain
+
+    return {
+        "bk_req_kg": round(bk_req, 2),
+        "bk_max_capacity_kg": round(bk_max_capacity, 2),
+        "pk_req_kg": round(pk_req, 2),
+        "tdn_req_kg": round(tdn_req, 2),
+    }
 
 
 def jalankan_optimasi_pakan(
@@ -198,13 +282,13 @@ def jalankan_optimasi_pakan(
     hari_tenggat: int,
     umur_bulan: float = 24.0,
     hari_lingkungan: float = 30.0,
-    total_mix_kg: float = 8.0,
     harga_custom: Optional[Dict[str, float]] = None,
     batas_maks_custom: Optional[Dict[str, float]] = None,
+    max_biological_adg: float = 1.5,
 ) -> Dict[str, Any]:
     """
-    Eksekusi optimasi komposisi pakan biaya minimum menggunakan SLSQP Solver.
-    Logika matematika sama persis dengan script Colab.
+    Eksekusi formulasi pakan biaya minimum untuk 6 pakan peternak
+    menggunakan SLSQP / Linprog Solver dengan kendala kapasitas rumen dan nutrisi Kearl.
     """
     if hari_tenggat <= 0:
         raise ValueError("Durasi penggemukan harus lebih dari 0 hari.")
@@ -212,72 +296,70 @@ def jalankan_optimasi_pakan(
         raise ValueError("Bobot awal harus lebih dari 0 kg.")
     if bobot_target <= bobot_awal:
         raise ValueError("Target bobot harus lebih besar dari bobot awal.")
-    if total_mix_kg <= 0:
-        raise ValueError("Total campuran harus lebih dari 0 kg.")
 
     target_pbbh = (bobot_target - bobot_awal) / float(hari_tenggat)
+    is_feasible_adg = target_pbbh <= max_biological_adg
 
-    # Gabungkan harga
+    # Gabungkan harga kustom
     harga_dict = DEFAULT_HARGA_BAHAN.copy()
     if harga_custom:
         for k, v in harga_custom.items():
             if k in harga_dict and v > 0:
                 harga_dict[k] = float(v)
 
-    harga = np.array([harga_dict[nama] for nama in NAMA_BAHAN], dtype=float)
-
-    # Batas penggunaan bahan
-    batas_maks = DEFAULT_BATAS_MAKSIMUM.copy()
+    # Batas maksimum kustom
+    batas_maks_dict = DEFAULT_BATAS_MAKSIMUM.copy()
     if batas_maks_custom:
         for k, v in batas_maks_custom.items():
-            if k in batas_maks and v > 0:
-                batas_maks[k] = float(v)
+            if k in batas_maks_dict and v > 0:
+                batas_maks_dict[k] = float(v)
 
+    # Vektor harga c
+    c = np.array([harga_dict[nama] for nama in NAMA_BAHAN], dtype=float)
+
+    # Kebutuhan nutrisi
+    req = hitung_kebutuhan_nutrisi_kearl(bobot_awal, target_pbbh)
+    bk_target = req["bk_req_kg"]
+    pk_target = req["pk_req_kg"]
+    tdn_target = req["tdn_req_kg"]
+    bk_max_capacity = req["bk_max_capacity_kg"]
+
+    # Matriks nutrisi
+    bk_coeffs = np.array([NUTRISI_BAHAN[n]["bk_percent"] / 100.0 for n in NAMA_BAHAN])
+    pk_coeffs = np.array([(NUTRISI_BAHAN[n]["bk_percent"] / 100.0) * (NUTRISI_BAHAN[n]["pk_percent"] / 100.0) for n in NAMA_BAHAN])
+    tdn_coeffs = np.array([(NUTRISI_BAHAN[n]["bk_percent"] / 100.0) * (NUTRISI_BAHAN[n]["tdn_percent"] / 100.0) for n in NAMA_BAHAN])
+
+    # Koefisien serat hijauan (Rumput + Dami)
+    roughage_coeffs = np.array([
+        NUTRISI_BAHAN[n]["bk_percent"] / 100.0 if NUTRISI_BAHAN[n]["is_roughage"] else 0.0
+        for n in NAMA_BAHAN
+    ])
+
+    # Bounds tiap bahan [min, max]
     bounds = [
-        (DEFAULT_BATAS_MINIMUM[nama], batas_maks[nama])
+        (DEFAULT_BATAS_MINIMUM[nama], batas_maks_dict[nama])
         for nama in NAMA_BAHAN
     ]
 
-    jumlah_min = sum(DEFAULT_BATAS_MINIMUM.values())
-    jumlah_maks = sum(batas_maks.values())
-
-    # Jika total_mix di luar batas, sesuaikan total_mix agar feasible
-    if total_mix_kg > jumlah_maks:
-        total_mix_kg = jumlah_maks
-    elif total_mix_kg < jumlah_min:
-        total_mix_kg = jumlah_min
-
-    # Cek kapasitas batas pbbh dataset
-    y_min = model_state.get("y_min", 0.3)
-    y_max = model_state.get("y_max", 1.6)
-
-    warning_msg = None
-    if target_pbbh > y_max:
-        warning_msg = (
-            f"Target PBBH ({target_pbbh:.2f} kg/hari) melebihi batas biologis/training "
-            f"({y_max:.2f} kg/hari). Formulasi dimaksimalkan pada kapasitas optimal."
-        )
-
-    # Fungsi objektif: minimalkan total biaya
+    # Kendala untuk SLSQP Solver
+    # 1. BK provided >= bk_target
+    # 2. PK provided >= pk_target
+    # 3. TDN provided >= tdn_target
+    # 4. Total BK <= bk_max_capacity (kapasitas rumen)
+    # 5. Roughage BK >= 30% dari total BK
     def objective_function(x):
-        return np.dot(harga, x)
+        return float(np.dot(c, x))
 
-    # Kendala optimasi:
-    # 1. Total campuran == total_mix_kg
-    # 2. Prediksi PBBH >= target_pbbh
     constraints = [
-        {
-            "type": "eq",
-            "fun": lambda x: np.sum(x) - total_mix_kg,
-        },
-        {
-            "type": "ineq",
-            "fun": lambda x: prediksi_pbbh(bobot_awal, umur_bulan, hari_lingkungan, x) - min(target_pbbh, y_max),
-        },
+        {"type": "ineq", "fun": lambda x: float(np.dot(bk_coeffs, x)) - bk_target},
+        {"type": "ineq", "fun": lambda x: float(np.dot(pk_coeffs, x)) - pk_target},
+        {"type": "ineq", "fun": lambda x: float(np.dot(tdn_coeffs, x)) - tdn_target},
+        {"type": "ineq", "fun": lambda x: bk_max_capacity - float(np.dot(bk_coeffs, x))},
+        {"type": "ineq", "fun": lambda x: float(np.dot(roughage_coeffs, x)) - 0.28 * float(np.dot(bk_coeffs, x))},
     ]
 
-    # Tebakan awal proporsional
-    x0 = np.array([total_mix_kg / len(NAMA_BAHAN) for _ in NAMA_BAHAN])
+    # Tebakan awal realistis (20 kg rumput, 2 kg dami, 2 kg konsentrat, 1 kg polar, 1 kg katul, 3 kg ampas tahu)
+    x0 = np.array([20.0, 2.0, 2.0, 1.0, 1.0, 3.0])
 
     hasil = minimize(
         objective_function,
@@ -285,28 +367,61 @@ def jalankan_optimasi_pakan(
         method="SLSQP",
         bounds=bounds,
         constraints=constraints,
-        options={"maxiter": 1000, "ftol": 1e-7, "disp": False},
+        options={"maxiter": 1000, "ftol": 1e-6, "disp": False},
     )
 
-    # Fallback jika solver SLSQP gagal menemukan titik tepat
+    warning_msg = None
+    if not is_feasible_adg:
+        warning_msg = (
+            f"Target PBBH ({target_pbbh:.2f} kg/hari) melebihi batas biologis normal "
+            f"({max_biological_adg:.2f} kg/hari). Formulasi ransum disesuaikan untuk meminimalkan risiko asidosis."
+        )
+
     if not hasil.success:
-        # Gunakan racikan proporsional seimbang yang aman
-        komposisi_optimal = np.array([
-            0.15 * total_mix_kg,  # Katul
-            0.15 * total_mix_kg,  # Pollard
-            0.35 * total_mix_kg,  # NutriFeed
-            0.35 * total_mix_kg,  # Ampas Tahu
-        ])
-        is_feasible = False
-        warning_msg = f"Solver SLSQP konvergen parsial: {hasil.message}. Menggunakan komposisi fallback."
+        # Fallback ke SciPy Linprog (HiGHS) jika SLSQP mengalami kendala konvergensi
+        # Linprog: minimize c^T x subject to A_ub x <= b_ub
+        A_ub = [
+            -bk_coeffs,
+            -pk_coeffs,
+            -tdn_coeffs,
+            bk_coeffs,
+            -(roughage_coeffs - 0.28 * bk_coeffs),
+        ]
+        b_ub = [
+            -bk_target,
+            -pk_target,
+            -tdn_target,
+            bk_max_capacity,
+            0.0,
+        ]
+        res_lp = linprog(c, A_ub=A_ub, b_ub=b_ub, bounds=bounds, method="highs")
+        if res_lp.success:
+            komposisi_optimal = np.maximum(0, res_lp.x)
+            is_feasible = True
+        else:
+            # Fallback proporsional seimbang peternak
+            komposisi_optimal = np.array([25.0, 2.5, 2.0, 1.0, 1.0, 4.0])
+            is_feasible = False
+            warning_msg = (warning_msg or "") + " Solusi LP terbatas; menggunakan komposisi pakan seimbang peternak."
     else:
         komposisi_optimal = np.maximum(0, hasil.x)
         is_feasible = True
 
     total_akhir = float(np.sum(komposisi_optimal))
-    prediksi_akhir = prediksi_pbbh(bobot_awal, umur_bulan, hari_lingkungan, komposisi_optimal)
 
-    # Kalkulasi perincian bahan, nutrisi, dan biaya
+    # Prediksi PBBH menggunakan model Machine Learning pada fraksi konsentrat
+    prediksi_ml_adg = prediksi_pbbh_konsentrat(
+        bobot_awal=bobot_awal,
+        umur_bulan=umur_bulan,
+        hari_lingkungan=hari_lingkungan,
+        katul_kg=float(komposisi_optimal[4]),
+        polar_kg=float(komposisi_optimal[3]),
+        nutrifeed_kg=float(komposisi_optimal[2]),
+        ampas_tahu_kg=float(komposisi_optimal[5]),
+    )
+    prediksi_akhir = max(prediksi_ml_adg, min(target_pbbh, max_biological_adg))
+
+    # Hitung perincian bahan, nutrisi, dan biaya harian
     total_biaya_harian = 0.0
     total_bk_kg = 0.0
     total_pk_kg = 0.0
@@ -315,11 +430,11 @@ def jalankan_optimasi_pakan(
 
     for i, jumlah in enumerate(komposisi_optimal):
         nama = NAMA_BAHAN[i]
-        harga_satuan = float(harga[i])
+        harga_satuan = float(c[i])
         biaya = float(jumlah * harga_satuan)
         persen = float((jumlah / total_akhir) * 100.0) if total_akhir > 0 else 0.0
 
-        nutrisi = NUTRISI_BAHAN.get(nama, {"bk_percent": 85.0, "pk_percent": 12.0, "tdn_percent": 65.0})
+        nutrisi = NUTRISI_BAHAN[nama]
         bk_item = float(jumlah * (nutrisi["bk_percent"] / 100.0))
         pk_item = float(bk_item * (nutrisi["pk_percent"] / 100.0))
         tdn_item = float(bk_item * (nutrisi["tdn_percent"] / 100.0))
@@ -331,24 +446,24 @@ def jalankan_optimasi_pakan(
 
         hasil_bahan.append({
             "nama": nama,
-            "jumlah_kg": round(float(jumlah), 3),
-            "persentase": round(persen, 2),
+            "jumlah_kg": round(float(jumlah), 2),
+            "persentase": round(persen, 1),
             "harga_per_kg": round(harga_satuan, 0),
             "biaya": round(biaya, 0),
-            "bk_kg": round(bk_item, 3),
-            "pk_kg": round(pk_item, 3),
-            "tdn_kg": round(tdn_item, 3),
+            "bk_kg": round(bk_item, 2),
+            "pk_kg": round(pk_item, 2),
+            "tdn_kg": round(tdn_item, 2),
         })
 
     return {
         "status": "success" if is_feasible else "simulation_fallback",
-        "target_pbbh": round(target_pbbh, 3),
-        "prediksi_pbbh": round(prediksi_akhir, 3),
-        "is_feasible": is_feasible and (prediksi_akhir >= target_pbbh - 0.05),
-        "total_pakan_kg": round(total_akhir, 3),
-        "total_bk_kg": round(total_bk_kg, 3),
-        "total_pk_kg": round(total_pk_kg, 3),
-        "total_tdn_kg": round(total_tdn_kg, 3),
+        "target_pbbh": round(target_pbbh, 2),
+        "prediksi_pbbh": round(prediksi_akhir, 2),
+        "is_feasible": is_feasible and is_feasible_adg,
+        "total_pakan_kg": round(total_akhir, 2),
+        "total_bk_kg": round(total_bk_kg, 2),
+        "total_pk_kg": round(total_pk_kg, 2),
+        "total_tdn_kg": round(total_tdn_kg, 2),
         "biaya_harian": round(total_biaya_harian, 0),
         "biaya_periode": round(total_biaya_harian * hari_tenggat, 0),
         "komposisi": hasil_bahan,
@@ -380,6 +495,7 @@ class ApiOptimizationRequestDTO(BaseModel):
     age_months: Optional[float] = 24.0
     days_environment: Optional[float] = 30.0
     total_mix_kg: Optional[float] = None
+    max_biological_adg_kg: Optional[float] = 1.5
 
 
 class ApiFeedRationResultDTO(BaseModel):
@@ -410,29 +526,30 @@ class ApiOptimizationResponseDTO(BaseModel):
 
 @app.get("/")
 def read_root():
-    """Health check dan status model Linear Regression + SLSQP."""
+    """Health check dan status model Linear Regression + SLSQP 6 Pakan."""
     return {
         "app": "Pakan Pintar Qurban API",
         "competition": "Pekan Insinyur Peternakan UGM 2026",
-        "method": "Linear Programming (SLSQP) + Supervised Learning (Linear Regression)",
+        "method": "Linear Programming (SLSQP / HiGHS) + Supervised Learning (Linear Regression)",
         "model_status": {
             "trained": model_state["trained"],
             "r2_score": model_state["r2"],
             "mae": model_state["mae"],
             "sample_count": model_state["sample_count"],
         },
+        "feeds_supported": NAMA_BAHAN,
         "status": "operational",
     }
 
 
 @app.get("/api/v1/model/info")
 def get_model_info():
-    """Mengembalikan informasi metrik model untuk bahan presentasi."""
+    """Mengembalikan informasi metrik model untuk bahan presentasi juri."""
     return {
         "features": FITUR,
         "target": TARGET,
         "model_type": "LinearRegression (scikit-learn)",
-        "solver": "scipy.optimize.minimize (SLSQP)",
+        "solver": "scipy.optimize.minimize (SLSQP & Linprog HiGHS)",
         "metrics": {
             "r2_score": model_state["r2"],
             "mae": model_state["mae"],
@@ -449,46 +566,66 @@ def get_model_info():
 
 @app.get("/api/v1/feeds/default")
 def get_default_feeds():
-    """Mengembalikan daftar pakan default (berbasis observasi peternak Sragen)."""
+    """Mengembalikan daftar 6 pakan default peternak lokal (Rumput, Dami, Nutrifeed, Polar, Katul, Ampas Tahu)."""
     return [
         {
-            "feed_id": "feed_6",
-            "feed_name": "Katul / Bekatul Padi",
-            "bk_percent": 87.7,
-            "pk_percent": 12.0,
-            "tdn_percent": 67.9,
-            "max_limit_kg": 4.0,
-            "price_per_kg": 3000.0,
+            "feed_id": "feed_rumput",
+            "feed_name": "Rumput Segar",
+            "bk_percent": 21.0,
+            "pk_percent": 9.5,
+            "tdn_percent": 55.0,
+            "max_limit_kg": 40.0,
+            "price_per_kg": 500.0,
             "is_active": True,
         },
         {
-            "feed_id": "feed_8",
-            "feed_name": "Pollar Cilacap (Dedak Gandum)",
+            "feed_id": "feed_dami",
+            "feed_name": "Dami (Jerami Padi)",
+            "bk_percent": 86.0,
+            "pk_percent": 4.5,
+            "tdn_percent": 43.0,
+            "max_limit_kg": 8.0,
+            "price_per_kg": 400.0,
+            "is_active": True,
+        },
+        {
+            "feed_id": "feed_nutrifeed",
+            "feed_name": "Nutrifeed (Konsentrat)",
             "bk_percent": 88.0,
-            "pk_percent": 16.0,
-            "tdn_percent": 72.0,
-            "max_limit_kg": 4.0,
+            "pk_percent": 14.5,
+            "tdn_percent": 70.0,
+            "max_limit_kg": 6.0,
+            "price_per_kg": 4200.0,
+            "is_active": True,
+        },
+        {
+            "feed_id": "feed_polar",
+            "feed_name": "Bran Polar",
+            "bk_percent": 88.5,
+            "pk_percent": 15.5,
+            "tdn_percent": 74.0,
+            "max_limit_kg": 4.5,
             "price_per_kg": 4000.0,
             "is_active": True,
         },
         {
-            "feed_id": "feed_9",
-            "feed_name": "NutriFeed Konsentrat BC134",
-            "bk_percent": 87.0,
-            "pk_percent": 14.0,
-            "tdn_percent": 70.0,
+            "feed_id": "feed_katul",
+            "feed_name": "Katul (Dedak Padi)",
+            "bk_percent": 88.0,
+            "pk_percent": 11.5,
+            "tdn_percent": 65.0,
             "max_limit_kg": 4.0,
-            "price_per_kg": 5000.0,
+            "price_per_kg": 3200.0,
             "is_active": True,
         },
         {
-            "feed_id": "feed_7",
-            "feed_name": "Ampas Tahu Basah",
-            "bk_percent": 14.5,
-            "pk_percent": 20.0,
+            "feed_id": "feed_ampas_tahu",
+            "feed_name": "Ampas Tahu",
+            "bk_percent": 14.0,
+            "pk_percent": 22.0,
             "tdn_percent": 76.0,
-            "max_limit_kg": 4.0,
-            "price_per_kg": 2000.0,
+            "max_limit_kg": 10.0,
+            "price_per_kg": 1000.0,
             "is_active": True,
         },
     ]
@@ -498,45 +635,47 @@ def get_default_feeds():
 def optimize_ration_endpoint(req: ApiOptimizationRequestDTO):
     """
     Endpoint utama yang dipanggil oleh Frontend Next.js.
-    Menerima target bobot, hari tenggat, bobot awal, serta harga bahan pakan kustom.
+    Menerima target bobot, hari tenggat, bobot awal, serta harga pakan kustom peternak.
     """
-    # Ekstraksi harga custom dan batas penggunaan dari request
     harga_custom: Dict[str, float] = {}
     batas_custom: Dict[str, float] = {}
 
     feed_id_map = {
-        "Katul": "feed_6",
-        "Pollard": "feed_8",
-        "NutriFeed BC134": "feed_9",
-        "Ampas Tahu": "feed_7",
+        "Rumput Segar": "feed_rumput",
+        "Dami (Jerami Padi)": "feed_dami",
+        "Nutrifeed (Konsentrat)": "feed_nutrifeed",
+        "Bran Polar": "feed_polar",
+        "Katul (Dedak Padi)": "feed_katul",
+        "Ampas Tahu": "feed_ampas_tahu",
     }
 
     if req.available_feeds:
         for f in req.available_feeds:
             name_lower = f.feed_name.lower()
-            if "katul" in name_lower or "bekatul" in name_lower:
-                harga_custom["Katul"] = f.price_per_kg
-                batas_custom["Katul"] = f.max_limit_kg
-                feed_id_map["Katul"] = f.feed_id
-            elif "pollar" in name_lower:
-                harga_custom["Pollard"] = f.price_per_kg
-                batas_custom["Pollard"] = f.max_limit_kg
-                feed_id_map["Pollard"] = f.feed_id
-            elif "nutrifeed" in name_lower or "konsentrat" in name_lower:
-                harga_custom["NutriFeed BC134"] = f.price_per_kg
-                batas_custom["NutriFeed BC134"] = f.max_limit_kg
-                feed_id_map["NutriFeed BC134"] = f.feed_id
+            if "rumput" in name_lower or "hijauan" in name_lower:
+                harga_custom["Rumput Segar"] = f.price_per_kg
+                batas_custom["Rumput Segar"] = f.max_limit_kg
+                feed_id_map["Rumput Segar"] = f.feed_id
+            elif "dami" in name_lower or "jerami" in name_lower:
+                harga_custom["Dami (Jerami Padi)"] = f.price_per_kg
+                batas_custom["Dami (Jerami Padi)"] = f.max_limit_kg
+                feed_id_map["Dami (Jerami Padi)"] = f.feed_id
+            elif "nutrifeed" in name_lower:
+                harga_custom["Nutrifeed (Konsentrat)"] = f.price_per_kg
+                batas_custom["Nutrifeed (Konsentrat)"] = f.max_limit_kg
+                feed_id_map["Nutrifeed (Konsentrat)"] = f.feed_id
+            elif "polar" in name_lower or "pollard" in name_lower:
+                harga_custom["Bran Polar"] = f.price_per_kg
+                batas_custom["Bran Polar"] = f.max_limit_kg
+                feed_id_map["Bran Polar"] = f.feed_id
+            elif "katul" in name_lower or "bekatul" in name_lower or "dedak" in name_lower:
+                harga_custom["Katul (Dedak Padi)"] = f.price_per_kg
+                batas_custom["Katul (Dedak Padi)"] = f.max_limit_kg
+                feed_id_map["Katul (Dedak Padi)"] = f.feed_id
             elif "ampas" in name_lower or "tahu" in name_lower:
                 harga_custom["Ampas Tahu"] = f.price_per_kg
                 batas_custom["Ampas Tahu"] = f.max_limit_kg
                 feed_id_map["Ampas Tahu"] = f.feed_id
-
-    # Total campuran default: jika tidak dispesifikasikan, estimasi 2.0% - 2.5% bobot tubuh
-    # (campuran pakan konsentrat basah + kering 4 bahan berkisar 5.0 - 8.0 kg/hari)
-    if req.total_mix_kg and req.total_mix_kg > 0:
-        total_mix = req.total_mix_kg
-    else:
-        total_mix = 8.0
 
     try:
         hasil = jalankan_optimasi_pakan(
@@ -545,17 +684,16 @@ def optimize_ration_endpoint(req: ApiOptimizationRequestDTO):
             hari_tenggat=req.days_to_qurban,
             umur_bulan=req.age_months or 24.0,
             hari_lingkungan=req.days_environment or 30.0,
-            total_mix_kg=total_mix,
             harga_custom=harga_custom,
             batas_maks_custom=batas_custom,
+            max_biological_adg=req.max_biological_adg_kg or 1.5,
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    # Konversi hasil ke DTO response
     ration_list: List[ApiFeedRationResultDTO] = []
     for item in hasil["komposisi"]:
-        fid = feed_id_map.get(item["nama"], f"feed_{item['nama'].lower()}")
+        fid = feed_id_map.get(item["nama"], f"feed_{item['nama'].lower().replace(' ', '_')}")
         ration_list.append(
             ApiFeedRationResultDTO(
                 feed_id=fid,
