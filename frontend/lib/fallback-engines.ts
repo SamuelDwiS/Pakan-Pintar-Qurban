@@ -359,9 +359,27 @@ export function optimizeRationFallback(params: {
   const remainingPk = Math.max(0, requirements.pkReqKg - pkFromLower);
   const remainingTdn = Math.max(0, requirements.tdnReqKg - tdnFromLower);
 
-  const reducedUpperBounds = activeFeeds.map((f, idx) =>
-    Math.max(0, f.maxLimitKg - lowerBounds[idx])
-  );
+  // Resep 4 konsentrat dikunci pada takaran tetap hasil wawancara peternak lapangan:
+  // Bran Pollard: 0.25 kg, NutriFeed: 1.25 kg, Ampas Tahu: 1.50 kg, Katul: 0.50 kg.
+  // reducedUpperBounds untuk keempat konsentrat bernilai 0 agar solver Least-Cost
+  // tidak melebihkan porsi konsentrat di atas takaran peternak, melainkan mengoptimalkan
+  // porsi hijauan serat (Rumput Segar & Dami) untuk menutup sisa kebutuhan nutrisi sapi.
+  const reducedUpperBounds = activeFeeds.map((f, idx) => {
+    const nl = f.name.toLowerCase();
+    const isFixedConcentrate =
+      nl.includes("polar") ||
+      nl.includes("pollard") ||
+      nl.includes("nutrifeed") ||
+      nl.includes("ampas") ||
+      nl.includes("katul") ||
+      nl.includes("bekatul") ||
+      nl.includes("dedak");
+
+    if (isFixedConcentrate) {
+      return 0.0;
+    }
+    return Math.max(0, f.maxLimitKg - lowerBounds[idx]);
+  });
 
   const solutionDelta = solveLeastCostLP(
     costs,

@@ -90,10 +90,10 @@ DEFAULT_BATAS_MINIMUM = {
 DEFAULT_BATAS_MAKSIMUM = {
     "Rumput Segar": 40.0,
     "Dami (Jerami Padi)": 8.0,
-    "Nutrifeed (Konsentrat)": 50.0,
-    "Bran Polar": 50.0,
-    "Katul (Dedak Padi)": 50.0,
-    "Ampas Tahu": 25.0,
+    "Nutrifeed (Konsentrat)": 1.25,    # Terkunci pada 1 1/4 kg sesuai resep tetap wawancara peternak
+    "Bran Polar": 0.25,               # Terkunci pada 1/4 kg sesuai resep tetap wawancara peternak
+    "Katul (Dedak Padi)": 0.50,       # Terkunci pada 1/2 kg sesuai resep tetap wawancara peternak
+    "Ampas Tahu": 1.50,               # Terkunci pada 1 1/2 kg sesuai resep tetap wawancara peternak
 }
 
 # Nutrisi dasar bahan untuk perhitungan BK (Dry Matter), PK (Crude Protein), TDN (Energy)
@@ -662,19 +662,19 @@ def optimize_ration_endpoint(req: ApiOptimizationRequestDTO):
                 feed_id_map["Dami (Jerami Padi)"] = f.feed_id
             elif "nutrifeed" in name_lower:
                 harga_custom["Nutrifeed (Konsentrat)"] = f.price_per_kg
-                batas_custom["Nutrifeed (Konsentrat)"] = f.max_limit_kg
+                batas_custom["Nutrifeed (Konsentrat)"] = min(f.max_limit_kg, 1.25)
                 feed_id_map["Nutrifeed (Konsentrat)"] = f.feed_id
             elif "polar" in name_lower or "pollard" in name_lower:
                 harga_custom["Bran Polar"] = f.price_per_kg
-                batas_custom["Bran Polar"] = f.max_limit_kg
+                batas_custom["Bran Polar"] = min(f.max_limit_kg, 0.25)
                 feed_id_map["Bran Polar"] = f.feed_id
             elif "katul" in name_lower or "bekatul" in name_lower or "dedak" in name_lower:
                 harga_custom["Katul (Dedak Padi)"] = f.price_per_kg
-                batas_custom["Katul (Dedak Padi)"] = f.max_limit_kg
+                batas_custom["Katul (Dedak Padi)"] = min(f.max_limit_kg, 0.50)
                 feed_id_map["Katul (Dedak Padi)"] = f.feed_id
             elif "ampas" in name_lower or "tahu" in name_lower:
                 harga_custom["Ampas Tahu"] = f.price_per_kg
-                batas_custom["Ampas Tahu"] = f.max_limit_kg
+                batas_custom["Ampas Tahu"] = min(f.max_limit_kg, 1.50)
                 feed_id_map["Ampas Tahu"] = f.feed_id
 
     try:

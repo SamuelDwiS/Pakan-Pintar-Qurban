@@ -441,8 +441,23 @@ INSTRUKSI KHUSUS FORMULASI:
       const maxLimit = Number(feed.maxLimitKg);
       let validAmount = Number(amount.toFixed(2));
 
-      // Jika AI merekomendasikan melebihi stok, potong otomatis ke stok maksimal
-      if (Number.isFinite(maxLimit) && maxLimit > 0 && validAmount > maxLimit) {
+      // Kunci takaran 4 konsentrat tepat sesuai porsi wawancara peternak lapangan:
+      // Bran Pollard: 0.25 kg, NutriFeed: 1.25 kg, Ampas Tahu: 1.50 kg, Katul: 0.50 kg
+      const nameLow = feed.name.toLowerCase();
+      if (nameLow.includes("nutrifeed")) {
+        validAmount = Math.min(maxLimit, 1.25);
+      } else if (nameLow.includes("polar") || nameLow.includes("pollard")) {
+        validAmount = Math.min(maxLimit, 0.25);
+      } else if (nameLow.includes("ampas")) {
+        validAmount = Math.min(maxLimit, 1.50);
+      } else if (
+        nameLow.includes("katul") ||
+        nameLow.includes("bekatul") ||
+        nameLow.includes("dedak")
+      ) {
+        validAmount = Math.min(maxLimit, 0.50);
+      } else if (Number.isFinite(maxLimit) && maxLimit > 0 && validAmount > maxLimit) {
+        // Jika pakan hijauan/serat melebihi stok, sesuaikan ke batas stok maksimal
         validAmount = maxLimit;
         warnings.push(
           `Takaran ${item.name} disesuaikan ke batas stok maksimal peternak (${maxLimit} kg/hari).`

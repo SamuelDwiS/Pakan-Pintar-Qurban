@@ -370,7 +370,21 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
               f.name.toLowerCase().includes("polar")
             )
           ) {
-            loadedFeeds = parsedFeeds;
+            // Selaraskan harga bawaan terbaru hasil wawancara peternak lapangan
+            const defMap = new Map(
+              DEFAULT_LOCAL_FEEDS.map((df) => [df.id, df])
+            );
+            loadedFeeds = parsedFeeds.map((f: FeedItem) => {
+              const def = defMap.get(f.id);
+              if (def) {
+                return {
+                  ...f,
+                  pricePerKg: def.pricePerKg,
+                  maxLimitKg: Math.max(f.maxLimitKg, def.maxLimitKg),
+                };
+              }
+              return f;
+            });
             hasSavedFeeds = true;
           }
         }
