@@ -84,11 +84,11 @@ export function DeveloperTeamFloatingWidget() {
                 <div className="grid grid-cols-1 gap-1.5 pl-1 text-[11px] text-slate-200 sm:grid-cols-2">
                   <div className="flex items-center justify-between sm:justify-start sm:gap-2">
                     <span className="font-bold text-white">Isa Bagus Prakoso</span>
-                    <span className="text-emerald-400 text-[10px]">(Ketua / Peneliti)</span>
+                    {/* <span className="text-emerald-400 text-[10px]">(Ketua / Peneliti)</span> */}
                   </div>
                   <div className="flex items-center justify-between sm:justify-start sm:gap-2">
                     <span className="font-bold text-white">Samuel Dwi Saputro</span>
-                    <span className="text-emerald-400 text-[10px]">(Software Engineer)</span>
+                    {/* <span className="text-emerald-400 text-[10px]">(Software Engineer)</span> */}
                   </div>
                   <div className="col-span-1 border-t border-emerald-500/20 pt-1.5 text-slate-400 flex items-center gap-1 sm:col-span-2">
                     <GraduationCap className="h-3.5 w-3.5 text-emerald-400" />
