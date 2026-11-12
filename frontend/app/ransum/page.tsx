@@ -129,18 +129,6 @@ export default function RansumPage() {
             <Database className="h-4 w-4 text-emerald-700" />
             <span>Master Pakan ({activeCount})</span>
           </Link>
-
-          <button
-            type="button"
-            disabled={isOptimizing}
-            onClick={() => runOptimization()}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-700 px-3.5 py-2 text-xs font-bold text-white shadow-xs transition-colors hover:bg-emerald-800 disabled:opacity-60 sm:text-sm"
-          >
-            <Sparkles className="h-4 w-4" />
-            <span>
-              {isOptimizing ? "Menghitung..." : "Hitung Ulang AI"}
-            </span>
-          </button>
         </div>
       </div>
 

@@ -25,6 +25,7 @@ import {
   optimizeRationFallback,
 } from "@/lib/fallback-engines";
 import type {
+  AiRationRecommendation,
   AuthUser,
   BarnItem,
   BreedItem,
@@ -49,6 +50,7 @@ const STORAGE_KEYS = {
   feeds: "ppq_local_feeds_v4",
   healthMap: "ppq_health_map_v3",
   healthHistoryMap: "ppq_health_history_map_v3",
+  aiRecommendations: "ppq_ai_recommendations_v1",
 } as const;
 
 export interface CattleFormInput {
@@ -140,6 +142,14 @@ interface AppStateContextValue {
   ) => Promise<OptimizationResult>;
   runHealthScreening: (input: HealthChecklistForm) => Promise<HealthStatus>;
   resetAllDemoData: () => Promise<void>;
+
+  // AI Ration Recommendation Persistence
+  aiRecommendationsByCattleId: Record<string, AiRationRecommendation>;
+  saveAiRecommendation: (
+    cattleId: string,
+    recommendation: AiRationRecommendation
+  ) => void;
+  clearAiRecommendation: (cattleId: string) => void;
 }
 
 const AppStateContext = createContext<AppStateContextValue | null>(null);
@@ -233,6 +243,9 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     )
   );
 
+  const [aiRecommendationsByCattleId, setAiRecommendationsByCattleId] =
+    useState<Record<string, AiRationRecommendation>>({});
+
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [isScreening, setIsScreening] = useState(false);
 
@@ -299,6 +312,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       let loadedFeeds = DEFAULT_LOCAL_FEEDS;
       let loadedHealthMap = buildInitialHealthMap(DEFAULT_CATTLE_LIST);
       let loadedHistoryMap = buildInitialHistoryMap(DEFAULT_CATTLE_LIST);
+      let loadedAiRecs: Record<string, AiRationRecommendation> = {};
       let hasSavedFeeds = false;
 
       try {
@@ -396,6 +410,16 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
           STORAGE_KEYS.healthHistoryMap
         );
         if (rawHistoryMap) loadedHistoryMap = JSON.parse(rawHistoryMap);
+
+        const rawAiRecs = localStorage.getItem(STORAGE_KEYS.aiRecommendations);
+        if (rawAiRecs) {
+          try {
+            const parsed = JSON.parse(rawAiRecs);
+            if (parsed && typeof parsed === "object") loadedAiRecs = parsed;
+          } catch {
+            // Ignore
+          }
+        }
       } catch {
         // Ignore storage errors
       }
@@ -446,6 +470,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       setFeeds(loadedFeeds);
       setHealthByCattleId(loadedHealthMap);
       setHealthHistoryByCattleId(loadedHistoryMap);
+      setAiRecommendationsByCattleId(loadedAiRecs);
       setOptimizationByCattleId(initialOptMap);
       setIsHydrated(true);
     }
@@ -800,6 +825,19 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
         delete next[id];
         return next;
       });
+      setAiRecommendationsByCattleId((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        try {
+          localStorage.setItem(
+            STORAGE_KEYS.aiRecommendations,
+            JSON.stringify(next)
+          );
+        } catch {
+          // Ignore
+        }
+        return next;
+      });
     },
     [activeCattleId]
   );
@@ -961,6 +999,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem(STORAGE_KEYS.feeds);
       localStorage.removeItem(STORAGE_KEYS.healthMap);
       localStorage.removeItem(STORAGE_KEYS.healthHistoryMap);
+      localStorage.removeItem(STORAGE_KEYS.aiRecommendations);
     } catch {
       // Ignore
     }
@@ -973,6 +1012,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     setFeeds(defFeeds);
     setHealthByCattleId(buildInitialHealthMap(DEFAULT_CATTLE_LIST));
     setHealthHistoryByCattleId(buildInitialHistoryMap(DEFAULT_CATTLE_LIST));
+    setAiRecommendationsByCattleId({});
     setOptimizationByCattleId(
       buildFallbackOptimizationMap(
         DEFAULT_CATTLE_LIST,
@@ -987,6 +1027,40 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       DEFAULT_BREEDS
     );
   }, [runOptimizationForCattle]);
+
+  const saveAiRecommendation = useCallback(
+    (cattleId: string, recommendation: AiRationRecommendation) => {
+      setAiRecommendationsByCattleId((prev) => {
+        const next = { ...prev, [cattleId]: recommendation };
+        try {
+          localStorage.setItem(
+            STORAGE_KEYS.aiRecommendations,
+            JSON.stringify(next)
+          );
+        } catch (err) {
+          console.error("Gagal menyimpan rekomendasi AI ke localStorage", err);
+        }
+        return next;
+      });
+    },
+    []
+  );
+
+  const clearAiRecommendation = useCallback((cattleId: string) => {
+    setAiRecommendationsByCattleId((prev) => {
+      const next = { ...prev };
+      delete next[cattleId];
+      try {
+        localStorage.setItem(
+          STORAGE_KEYS.aiRecommendations,
+          JSON.stringify(next)
+        );
+      } catch (err) {
+        console.error("Gagal mengupdate rekomendasi AI di localStorage", err);
+      }
+      return next;
+    });
+  }, []);
 
   const value = useMemo<AppStateContextValue>(
     () => ({
@@ -1034,6 +1108,9 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       runOptimization,
       runHealthScreening,
       resetAllDemoData,
+      aiRecommendationsByCattleId,
+      saveAiRecommendation,
+      clearAiRecommendation,
     }),
     [
       isHydrated,
@@ -1079,6 +1156,9 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       runOptimization,
       runHealthScreening,
       resetAllDemoData,
+      aiRecommendationsByCattleId,
+      saveAiRecommendation,
+      clearAiRecommendation,
     ]
   );
 

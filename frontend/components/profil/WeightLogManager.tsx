@@ -1,13 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import {
   Activity,
   AlertTriangle,
   Calculator,
+  Check,
+  ChevronDown,
+  ChevronUp,
   Plus,
+  Ruler,
   ShieldAlert,
   Trash2,
   TrendingDown,
@@ -45,11 +49,20 @@ export function WeightLogManager({
   const latestDiff = prevLog && latestLog ? Number((latestLog.weightKg - prevLog.weightKg).toFixed(1)) : 0;
   const hasLatestDrop = latestDiff < 0;
 
+  const [showGuide, setShowGuide] = useState(true);
+  const [chestGirthCm, setChestGirthCm] = useState<number | "">("");
+
+  const calculatedSchoorlWeight =
+    typeof chestGirthCm === "number" && chestGirthCm >= 80 && chestGirthCm <= 300
+      ? Number((Math.pow(chestGirthCm + 22, 2) / 100).toFixed(1))
+      : null;
+
   const {
     register,
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LogFormValues>({
     defaultValues: {
@@ -58,6 +71,12 @@ export function WeightLogManager({
       note: "",
     },
   });
+
+  const handleApplySchoorlWeight = () => {
+    if (calculatedSchoorlWeight !== null) {
+      setValue("weightKg", calculatedSchoorlWeight, { shouldValidate: true });
+    }
+  };
 
   const watchedWeight = watch("weightKg");
   const isInputDropping = Boolean(
@@ -135,6 +154,114 @@ export function WeightLogManager({
           </div>
         </div>
       )}
+
+      {/* Panduan Pendugaan Bobot via Pita Ukur & Rumus Schoorl */}
+      <div className="overflow-hidden rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50/80 via-white to-emerald-50/60 p-4 shadow-xs space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-sky-100 pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-sky-600 text-white shadow-xs">
+              <Ruler className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-xs sm:text-sm font-bold text-sky-950">
+                  Panduan Menimbang Sapi Tanpa Timbangan Lantai
+                </h4>
+                <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-extrabold text-sky-800">
+                  Rumus Baku Schoorl
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500">
+                Gunakan pita ukur ternak / meteran jahit melingkari dada di belakang punuk sapi.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowGuide((prev) => !prev)}
+            className="text-xs font-semibold text-sky-700 hover:text-sky-900 inline-flex items-center gap-1 cursor-pointer"
+          >
+            {showGuide ? "Sembunyikan Panduan" : "Buka Panduan & Kalkulator"}
+            {showGuide ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+          </button>
+        </div>
+
+        {showGuide && (
+          <div className="space-y-3 pt-1 text-xs text-slate-700">
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+              <div className="rounded-xl border border-sky-100 bg-white/80 p-2.5 space-y-1">
+                <span className="font-bold text-sky-900 flex items-center gap-1">
+                  1. Alat: Pita Ukur
+                </span>
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  Cukup gunakan pita ukur ternak (weight-tape Rp 35rb) atau meteran kain jahit biasa.
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-sky-100 bg-white/80 p-2.5 space-y-1">
+                <span className="font-bold text-sky-900 flex items-center gap-1">
+                  2. Posisi Pengukuran
+                </span>
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  Lingkarkan tepat di belakang punuk dan di belakang kedua kaki depan sapi tegak lurus.
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-sky-100 bg-white/80 p-2.5 space-y-1">
+                <span className="font-bold text-sky-900 flex items-center gap-1">
+                  3. Rumus Schoorl (Akurasi &gt;90%)
+                </span>
+                <p className="text-[11px] text-slate-600 leading-relaxed font-mono font-bold text-emerald-800">
+                  Bobot = (LD + 22)² / 100
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Interactive Mini Calculator */}
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-bold text-emerald-950">
+                  Kalkulator Lingkar Dada Cepat:
+                </span>
+                <div className="relative inline-flex items-center">
+                  <input
+                    type="number"
+                    min="80"
+                    max="280"
+                    placeholder="Contoh: 180"
+                    value={chestGirthCm}
+                    onChange={(e) =>
+                      setChestGirthCm(e.target.value ? Number(e.target.value) : "")
+                    }
+                    className="w-28 rounded-lg border border-emerald-300 bg-white px-2.5 py-1 text-xs font-bold text-slate-800 focus:border-emerald-600 focus:outline-none"
+                  />
+                  <span className="absolute right-2 text-[10px] font-semibold text-slate-400">cm</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                {calculatedSchoorlWeight !== null && (
+                  <div className="text-xs">
+                    <span className="text-slate-500">Hasil Hitung: </span>
+                    <strong className="text-emerald-800 text-sm font-black">
+                      {calculatedSchoorlWeight} kg
+                    </strong>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  disabled={calculatedSchoorlWeight === null}
+                  onClick={handleApplySchoorlWeight}
+                  className="inline-flex items-center gap-1 rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-bold text-white shadow-2xs hover:bg-emerald-800 disabled:opacity-50 transition-colors cursor-pointer"
+                >
+                  <Check className="h-3 w-3" />
+                  <span>Terapkan ke Input Bobot</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Form Tambah Timbangan */}
       <form

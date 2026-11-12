@@ -15,6 +15,7 @@ import {
   Sparkles,
   Wheat,
 } from "lucide-react";
+import { useAppState } from "@/context/AppStateContext";
 import { formatKg, formatRupiah } from "@/lib/formatters";
 import type {
   AiRationRecommendation,
@@ -36,16 +37,25 @@ export function AiRecommendationCard({
   daysToQurban,
   optimizationResult,
 }: AiRecommendationCardProps) {
-  const [recommendation, setRecommendation] =
-    useState<AiRationRecommendation | null>(null);
+  const {
+    aiRecommendationsByCattleId,
+    saveAiRecommendation,
+    runOptimization,
+  } = useAppState();
+
+  const recommendation = aiRecommendationsByCattleId[profile.id] || null;
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const fetchAiRecommendation = async () => {
+  const executeFullOptimizationAndAi = async () => {
     setIsLoading(true);
     setErrorMsg(null);
 
     try {
+      // 1. Eksekusi Solver Matematika (Linear Programming Least-Cost)
+      const freshOptResult = await runOptimization();
+
+      // 2. Eksekusi Rekomendasi Generative AI (Google Gemini Live API)
       const res = await fetch("/api/ai/ration-recommendation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -59,7 +69,7 @@ export function AiRecommendationCard({
             targetDateQurban: profile.targetDateQurban,
           },
           feeds: feeds.filter((f) => f.isActive),
-          optimizationResult,
+          optimizationResult: freshOptResult || optimizationResult,
         }),
       });
 
@@ -68,7 +78,8 @@ export function AiRecommendationCard({
       }
 
       const data = (await res.json()) as AiRationRecommendation;
-      setRecommendation(data);
+      // 3. Simpan hasil secara otomatis ke localStorage per sapi
+      saveAiRecommendation(profile.id, data);
     } catch (err: any) {
       console.error(err);
       setErrorMsg(err.message || "Terjadi kesalahan saat menghubungi API.");
@@ -104,23 +115,23 @@ export function AiRecommendationCard({
         <button
           type="button"
           disabled={isLoading}
-          onClick={fetchAiRecommendation}
+          onClick={executeFullOptimizationAndAi}
           className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-teal-700 to-emerald-700 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-all hover:from-teal-800 hover:to-emerald-800 disabled:opacity-60 sm:text-sm"
         >
           {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Menganalisis...</span>
+              <span>Menghitung &amp; Menganalisis AI...</span>
             </>
           ) : recommendation ? (
             <>
               <RefreshCw className="h-4 w-4" />
-              <span>Analisis Ulang AI</span>
+              <span>Optimasi &amp; Analisis Ulang AI</span>
             </>
           ) : (
             <>
               <Sparkles className="h-4 w-4" />
-              <span>Minta Rekomendasi AI</span>
+              <span>Hitung Ransum &amp; Rekomendasi AI</span>
             </>
           )}
         </button>

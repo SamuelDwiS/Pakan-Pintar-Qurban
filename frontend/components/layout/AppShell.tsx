@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ShieldAlert } from "lucide-react";
 import { GlossaryModal } from "@/components/ui/GlossaryModal";
+import { DeveloperTeamFloatingWidget } from "@/components/ui/DeveloperTeamFloatingWidget";
 import { useAppState } from "@/context/AppStateContext";
 import { BottomMobileNav } from "./BottomMobileNav";
 import { DesktopSidebar } from "./DesktopSidebar";
@@ -122,6 +123,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         isOpen={glossaryOpen}
         onClose={() => setGlossaryOpen(false)}
       />
+
+      {/* Floating Pop-up Asisten / Info Tim Pengembang & Kemitraan */}
+      <DeveloperTeamFloatingWidget />
     </div>
   );
 }
